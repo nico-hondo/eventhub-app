@@ -1,12 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from "react-router"
 import './index.css'
-// import SignIn from './pages/auth/SignIn'
-// import SignUp from './pages/auth/SignUp'
-import ForgotPass from './pages/auth/ForgotPass'
+import Router from './Router.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ForgotPass />
+    <BrowserRouter>
+        <Router/>
+    </BrowserRouter>
   </StrictMode>,
 )
