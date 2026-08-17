@@ -1,9 +1,10 @@
-import { useState } from "react";
+// import { useState } from "react";
 import EventDiscover from "../../../components/event/EventDiscover";
-import { discover } from "../services/data-dummy";
+import events from '../../../data/events';
+import { convertDate } from "../../../components/utils/utilitas";
 
 function Discover() {
-    const [data] = useState(discover);
+    // const [data] = useState(discover);
   return (
     <section className="w-full flex justify-center items-center py-4">
         <div className="max-w-6xl flex-1 flex flex-col gap-5">
@@ -12,18 +13,19 @@ function Discover() {
                 <span className="text-xs text-gray-400 cursor-pointer">See all &#8594;</span>
             </div>
             <div className="grid grid-rows-2 grid-cols-3 gap-5">
-                {data.map((val) => {
+                {events.slice(0,6).map((val) => {
                     return(
                         <EventDiscover
                             key={val.id}
-                            type={val.type}
+                            id={val.id}
+                            type={val.tags}
                             title={val.title}
-                            date={val.date}
-                            hour={val.hour}
-                            at={val.at}
-                            participant={val.participant}
-                            slot={val.slot}
-                            pict={val.img}
+                            date={convertDate(val.date)}
+                            hour={val.start_time}
+                            at={val.location}
+                            participant={val.attendees_count}
+                            slot={val.capacity}
+                            pict={val.image_url}
                         />
                     )
                 })}

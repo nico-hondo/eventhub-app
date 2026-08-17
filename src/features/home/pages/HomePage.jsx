@@ -1,4 +1,4 @@
-import Navbar from "../../../components/layout/Navbar"
+
 import Hero from "../components/Hero"
 import Discover from "../components/Discover"
 import Popular from "../components/Popular"
@@ -8,7 +8,6 @@ import CommunityCTA from "../components/CommunityCTA"
 function HomePage() {
   return (
     <>
-      <Navbar/>
       <main className="flex flex-col gap-6">
         <Hero/>
         <Discover/>

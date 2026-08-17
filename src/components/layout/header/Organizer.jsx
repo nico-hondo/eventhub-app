@@ -1,7 +1,8 @@
-import { NavLink, Link } from "react-router"
+import { NavLink } from "react-router"
 import { FiMoon } from "react-icons/fi";
+import { IoNotificationsOutline } from "react-icons/io5";
 
-function Navbar() {
+function Organizer() {
   return (
     <>
         <header className="w-full">
@@ -16,13 +17,16 @@ function Navbar() {
                             <li className=""><NavLink to="/">Explore</NavLink></li>
                             <li><NavLink to="/events">Events</NavLink></li>
                             <li><NavLink to="/communities">Communities</NavLink></li>
+                            <li><NavLink to="/">My Events</NavLink></li>
                         </ul>
                     </nav>
                 </div>
                 <div className="flex items-center gap-5">
-                    <span className="text-gray-400 text-xs">Browsing as guest</span>
+                    <IoNotificationsOutline className="text-xs text-gray-800"/>
                     <FiMoon className="text-gray-800 cursor-pointer"/>
-                    <span className="bg-orange-600 text-gray-100 text-xs font-medium rounded-md px-3 py-2 cursor-pointer"><Link to="/auth">Sign In</Link></span>
+                    <div>
+                        <span></span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -30,4 +34,4 @@ function Navbar() {
   )
 }
 
-export default Navbar
+export default Organizer

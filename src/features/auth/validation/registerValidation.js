@@ -1,6 +1,8 @@
-export default function validateRegister(val){
+export default function validateRegister(val, users){
     const {nama, email, pass, confPass, useTerms} = val;
     const objError = {};
+
+    const existingUser = users.find(user => user.email === email);
 
     if(!nama.trim()){
         objError.nama = "Full name is required";
@@ -11,6 +13,10 @@ export default function validateRegister(val){
     if(!email.includes("@")){
         objError.email = "Please enter a valid email address";
     }
+    if(existingUser){
+        objError.email = "Email sudah terdaftar";
+    }
+
     if(!pass){
         objError.pass = "Password is required";
     }else if(pass.length < 8){

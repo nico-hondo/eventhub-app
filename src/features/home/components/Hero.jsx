@@ -1,5 +1,6 @@
 import { HiOutlineSparkles } from "react-icons/hi2";
 import { BsFillSearchHeartFill } from "react-icons/bs";
+import { Button } from "../../../components/common/Button";
 
 function Hero() {
 
@@ -18,7 +19,7 @@ function Hero() {
                     <form className="relative">
                         <BsFillSearchHeartFill className="absolute inset-y-2.5 left-3 text-lg font-bold text-gray-600"/>
                         <input type="text" className="w-full h-10 bg-white rounded-lg px-10 text-sm" placeholder="Search events, topics, or locations..."></input>
-                        <button className="absolute inset-y-1 right-2 text-gray-100 text-sm w-20 h-8 rounded-lg bg-orange-500 cursor-pointer">Search</button>
+                        <Button isValue={"search"}/>
                     </form>
                     <div className="flex gap-2 justify-center items-center">
                         {typeEvent.map((val) => {

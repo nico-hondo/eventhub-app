@@ -1,0 +1,37 @@
+import { NavLink } from "react-router"
+import { FiMoon } from "react-icons/fi";
+import { IoNotificationsOutline } from "react-icons/io5";
+
+function Admin() {
+  return (
+    <>
+        <header className="w-full">
+            <div className="px-7 py-4 flex justify-between items-center">
+                <div className="flex gap-6 items-center"> 
+                    <div className="flex gap-2">
+                        <span className="rounded-lg text-center font-medium text-md px-2.5 py-0.5 text-gray-200 bg-orange-500">E</span>
+                        <h1 className="text-lg text-gray-800 font-medium">EventHub</h1>
+                    </div>
+                    <nav>
+                        <ul className="flex text-sm font-medium text-gray-600 gap-4">
+                            <li className=""><NavLink to="/">Explore</NavLink></li>
+                            <li><NavLink to="/events">Events</NavLink></li>
+                            <li><NavLink to="/communities">Communities</NavLink></li>
+                            <li><NavLink to="/">My Events</NavLink></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div className="flex items-center gap-5">
+                    <IoNotificationsOutline className="text-xs text-gray-800"/>
+                    <FiMoon className="text-gray-800 cursor-pointer"/>
+                    <div>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </>
+  )
+}
+
+export default Admin

@@ -37,7 +37,7 @@ function SignIn() {
                             const user = {email, pass};
 
                             //kita get data dari local
-                            const getUser = JSON.parse(localStorage.getItem('signUp') || []);
+                            const getUser = JSON.parse(localStorage.getItem('users') || []);
 
                             const err = handleLogin(user, getUser);
 
@@ -55,6 +55,7 @@ function SignIn() {
                             const session = {
                                 nama: foundUser.nama,
                                 email: foundUser.email,
+                                role: foundUser.role,
                                 token: 1,
                             }
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
+
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import AuthSidePanel from "../components/AuthSidePanel";
@@ -8,7 +10,9 @@ import Alert from "../components/Alert";
 
 function SignUp() {
     const [error, setError] = useState("");
+    const role = "attendee";
 
+    const navigate = useNavigate();
   return (
         <div className="w-full h-screen flex flex-row">
             <AuthSidePanel/>
@@ -37,9 +41,13 @@ function SignUp() {
                                 const confPass = e.target.confpass.value;
                                 const useTerms = e.target.terms.checked;
 
-                                const objUser = {nama, email, pass, confPass, useTerms};
+                                const validateUser = {nama, email, pass, confPass, useTerms, role};
                                 
-                                const err = validateRegister(objUser);
+                                const objUser = {nama, email, pass, useTerms, role};
+
+                                const users = JSON.parse(localStorage.getItem('users')) || [];
+
+                                const err = validateRegister(validateUser, users);
                                 
                                 setError(err);
 
@@ -49,17 +57,17 @@ function SignUp() {
                                 }
 
                                 //kalau sudah masuk localStorage, maka validasi lolos
-                                const localUser = JSON.parse(localStorage.getItem("signUp"))
-
-                                if(!localUser){
-                                    localStorage.setItem("signUp", JSON.stringify([objUser]));
+                                if(!users){
+                                    localStorage.setItem("users", JSON.stringify([objUser]));
                                 }else{
-                                    const addUser = [...localUser, objUser];
+                                    const addUser = [...users, objUser];
 
-                                    localStorage.setItem("signUp", JSON.stringify(addUser));
+                                    localStorage.setItem("users", JSON.stringify(addUser));
                                 }
                             
                                 e.target.reset();
+
+                                navigate('/auth');
                         }}
                     className="grid gap-2">
                         <div className="flex flex-col gap-2">
