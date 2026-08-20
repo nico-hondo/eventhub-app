@@ -10,6 +10,12 @@ import MyEvents from "./features/saved/pages/MyEvents.jsx";
 
 //Detail - pages
 import DetailEvent from "./features/event/pages/DetailEvent.jsx";
+import DetailCommunity from "./features/community/pages/DetailCommunity.jsx";
+
+//community - pages
+import CommunityDetailDiscuss from "./features/community/pages/CommunityDetailDiscuss.jsx";
+import CommunityDetailMembers from "./features/community/pages/CommunityDetailMembers.jsx";
+import CommunityDetailUpcomingEv from "./features/community/pages/CommunityDetailUpcomingEv.jsx";
 
 function Router() {
   return (
@@ -20,7 +26,15 @@ function Router() {
           <Route index element={<EventPage/>} />
           <Route path=":id/:slug" element={<DetailEvent/>}/>
         </Route>
-        <Route path="communities" element={<CommunityPage/>} />
+        <Route path="communities">
+          <Route index  element={<CommunityPage/>}/>
+          <Route path=":id/:slug" element={<DetailCommunity/>}>
+            <Route index element={<CommunityDetailUpcomingEv/>}/>
+            <Route path="members" element={<CommunityDetailMembers />}/>
+            <Route path="discuss" element={<CommunityDetailDiscuss />}/>
+          </Route>
+          
+        </Route>
         <Route path="my-events" element={<MyEvents/>} />
       </Route>
       <Route path="auth">

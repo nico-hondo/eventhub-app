@@ -32,6 +32,7 @@ function CommunityList() {
                                 return(
                                     <EventCommunities
                                         key={val.id}
+                                        id={val.id}
                                         title={val.name}
                                         desc={val.description}
                                         type={val.tags}

@@ -4,7 +4,7 @@ import { FiMoon } from "react-icons/fi";
 function Guest() {
   return (
     <>
-        <header className="w-full">
+        <header className="w-full sticky top-0 z-50 bg-white border border-gray-200">
             <div className="px-7 py-4 flex justify-between items-center">
                 <div className="flex gap-6 items-center"> 
                     <div className="flex gap-2">

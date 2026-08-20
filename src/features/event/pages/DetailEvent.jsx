@@ -1,7 +1,7 @@
 // import { useEffect, useState } from "react";
 import { useParams } from "react-router"
 import events from '../../../data/events.json';
-import BreadCrumb from "../component/detail/BreadCrumb";
+import BreadCrumb from "../../../components/common/BreadCrumb";
 import DetailContent from "../component/DetailContent";
 
 function DetailEvent() {
@@ -17,7 +17,7 @@ function DetailEvent() {
 
   return (
     <>
-        <BreadCrumb/>
+        <BreadCrumb isString={"events"}/>
         <DetailContent data={foundEvent}/>
     </>
   )

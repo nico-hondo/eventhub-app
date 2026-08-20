@@ -34,7 +34,7 @@ function DetailContent({data}) {
                     <div className="flex gap-2">
                         {data.speakers.map((val) => {
                             return(
-                                <div className="flex px-4 py-2 gap-2 bg-white border border-gray-200 rounded-lg">
+                                <div className="flex px-5 py-3 gap-2 bg-white border border-gray-200 rounded-lg">
                                     <img src={val.avatar_url} alt={val.name} className="w-8 h-8 object-cover rounded-full"/>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-medium text-gray-800 leading-2">{val.name}</span>
