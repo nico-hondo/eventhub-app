@@ -25,7 +25,9 @@ function DetailLayout({data}) {
                         <div className="flex gap-3">
                             {data.tags.map((val) => {
                                 return(
-                                    <span key={val} className="px-3 py-0.5 bg-orange-600 rounded-full text-xs text-white">{val}</span>
+                                    <span key={val} className="px-3 py-0.5 bg-orange-600 rounded-full text-xs text-white">
+                                        {val}
+                                    </span>
                                 )
                             })}
                         </div>

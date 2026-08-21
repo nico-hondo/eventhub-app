@@ -7,6 +7,9 @@ import SignUp from './features/auth/pages/SignUp.jsx';
 import ForgotPass from './features/auth/pages/ForgotPass.jsx';
 import MainLayout from "./components/layout/MainLayout.jsx";
 import MyEvents from "./features/saved/pages/MyEvents.jsx";
+import UpcomingEvent from "./features/saved/component/UpcomingEvent.jsx";
+import SavedEvent from "./features/saved/component/SavedEvent.jsx";
+import PastEvent from "./features/saved/component/PastEvent.jsx";
 
 //Detail - pages
 import DetailEvent from "./features/event/pages/DetailEvent.jsx";
@@ -33,9 +36,12 @@ function Router() {
             <Route path="members" element={<CommunityDetailMembers />}/>
             <Route path="discuss" element={<CommunityDetailDiscuss />}/>
           </Route>
-          
         </Route>
-        <Route path="my-events" element={<MyEvents/>} />
+        <Route path="my-events" element={<MyEvents/>}>
+          <Route index element={< UpcomingEvent/>}/>
+          <Route path="past-event" element={< PastEvent/>}/>
+          <Route path="saved-event" element={< SavedEvent/>}/>
+        </Route>
       </Route>
       <Route path="auth">
           <Route index element={<SignIn/>}/>
