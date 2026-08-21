@@ -20,6 +20,12 @@ import CommunityDetailDiscuss from "./features/community/pages/CommunityDetailDi
 import CommunityDetailMembers from "./features/community/pages/CommunityDetailMembers.jsx";
 import CommunityDetailUpcomingEv from "./features/community/pages/CommunityDetailUpcomingEv.jsx";
 
+//profile - pages
+import ProfileLayout from "./features/profile/components/ProfileLayout.jsx";
+import ProfileEvents from "./features/profile/pages/ProfileEvents.jsx";
+import ProfileCommunity from "./features/profile/pages/ProfileCommunity.jsx";
+import ProfileSaved from "./features/profile/pages/ProfileSaved.jsx";
+
 function Router() {
   return (
     <Routes>
@@ -39,8 +45,13 @@ function Router() {
         </Route>
         <Route path="my-events" element={<MyEvents/>}>
           <Route index element={< UpcomingEvent/>}/>
-          <Route path="past-event" element={< PastEvent/>}/>
-          <Route path="saved-event" element={< SavedEvent/>}/>
+          <Route path="past-event" element={<PastEvent/>}/>
+          <Route path="saved-event" element={<SavedEvent/>}/>
+        </Route>
+        <Route path="profile" element={<ProfileLayout/>}>
+          <Route index element={<ProfileEvents/>}/>
+          <Route path="community" element={<ProfileCommunity/>}/>
+          <Route path="saved" element={<ProfileSaved/>}/>
         </Route>
       </Route>
       <Route path="auth">
