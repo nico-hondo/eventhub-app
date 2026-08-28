@@ -33,12 +33,19 @@ import ProfileCommunity from "./features/profile/pages/ProfileCommunity.jsx";
 import ProfileSaved from "./features/profile/pages/ProfileSaved.jsx";
 
 //dashboard - organizer
-import Dashboard from "./features/organizer/pages/Dashboard.jsx";
+import DashboardOrganizer from "./features/organizer/pages/Dashboard.jsx";
 import CreateEvent from "./features/organizer/pages/CreateEvent.jsx";
 import BasicInformationCreate from "./features/organizer/components/BasicInformationCreate.jsx";
 import DetailCreate from "./features/organizer/components/DetailCreate.jsx";
 import SpeakerAndReview from "./features/organizer/components/SpeakerAndReview.jsx";
 import FinishCreated from "./features/organizer/components/FinishCreated.jsx";
+
+//dashboard - admin
+import AdminDashboard from "./features/admin/components/AdminLayout.jsx";
+import Users from "./features/admin/pages/Users.jsx";
+import Overview from "./features/admin/pages/Overview.jsx";
+import Events from "./features/admin/pages/Events.jsx";
+import Communities from "./features/admin/pages/Communities.jsx";
 
 function Router() {
   return (
@@ -71,14 +78,20 @@ function Router() {
           <Route path="community" element={<ProfileCommunity/>}/>
           <Route path="saved" element={<ProfileSaved/>}/>
         </Route>
-        <Route path="dashboard">
-          <Route index element={<Dashboard/>}/>
+        <Route path="organizer">
+          <Route index element={<DashboardOrganizer/>}/>
           <Route path="create-event" element={<CreateEvent/>}> 
             <Route index element={<BasicInformationCreate/>}/>
             <Route path="detail" element={<DetailCreate/>}/>
             <Route path="review" element={<SpeakerAndReview/>}/>
             <Route path="success" element={<FinishCreated/>} />
           </Route>
+        </Route>
+        <Route path="admin" element={<AdminDashboard/>}>
+          <Route index element={<Overview/>}/>
+          <Route path="users" element={<Users/>} />
+          <Route path="events" element={<Events/>} />
+          <Route path="communities" element={<Communities/>} />
         </Route>
         <Route path="*" element={<NotFoundPage/>}/>
       </Route>

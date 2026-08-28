@@ -32,7 +32,7 @@ function Organizer({session, onLogout}) {
                     </nav>
                 </div>
                 <div className="flex items-center gap-5">
-                    <NavLink to="dashboard" className={({isActive}) => isActive ? "w-25 h-6 text-orange-500 bg-orange-100 flex justify-center items-center gap-2 rounded-lg" : `w-25 h-6 justify-center items-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} flex gap-2 hover:text-orange-500`}>
+                    <NavLink to="organizer" className={({isActive}) => isActive ? "w-25 h-6 text-orange-500 bg-orange-100 flex justify-center items-center gap-2 rounded-lg" : `w-25 h-6 justify-center items-center ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} flex gap-2 hover:text-orange-500`}>
                         <MdOutlineDashboard className="text-md cursor-pointer"/>
                         <span className="text-xs">Dashboard</span>
                     </NavLink>
