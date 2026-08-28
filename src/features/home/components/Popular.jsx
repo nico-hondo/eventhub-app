@@ -1,12 +1,12 @@
 import EventCommunities from "../../../components/communities/EventCommunities";
 import community from "../../../data/communities.json";
 
-function Popular() {
+function Popular({theme}) {
   return (
     <section className="w-full flex justify-center items-center py-4">
         <div className="max-w-6xl flex-1 flex flex-col gap-5">
             <div className="w-full flex justify-between items-center">
-                <h3 className="text-lg text-gray-800 font-medium">Popular Communities</h3>
+                <h3 className={`text-lg ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'} font-medium`}>Popular Communities</h3>
                 <span className="text-xs text-gray-400">See all &#8594;</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

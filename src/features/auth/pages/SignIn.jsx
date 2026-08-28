@@ -16,7 +16,7 @@ function SignIn() {
                 <div className="max-w-5xl grid gap-5">
                     <div className="grid gap-2">
                         <h3 className="font-medium text-2xl text-bold text-black">Welcome Back</h3>
-                        <p className="text-gray-500 text-xs">Don't have an account? <span className="text-orange-600 font-semibold cursor-pointer"><Link to={"/auth/sign-up"}>Sign up</Link></span></p>
+                        <p className="text-gray-500 text-xs">Don't have an account? <span className="text-orange-600 font-semibold cursor-pointer"><Link to={"/auth/register"}>Sign up</Link></span></p>
                     </div>
                     <div className="w-full flex justify-between gap-2">
                         <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer"><FaGoogle className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Google</span></div>

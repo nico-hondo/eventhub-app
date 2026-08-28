@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import { Link } from "react-router";
 import slugify from 'slugify';
@@ -6,6 +6,8 @@ import slugify from 'slugify';
 import { CiCalendar } from "react-icons/ci";
 import { IoPeopleOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
+
+import themeContext from "../../context/theme/themeContext";
 
 function EventCommunities({id, title, desc, type, member, agenda, pict}) {
     const slug = slugify(title, {
@@ -20,11 +22,10 @@ function EventCommunities({id, title, desc, type, member, agenda, pict}) {
     });
 
     const session = localStorage.getItem('session');
-    const dataSesi = JSON.parse(session);
+    const dataSesi = session ? JSON.parse(session) : null;
 
     //kita cek apakah id yang saat ini sudah ada di join community
-    const isJoined = joinedCommunity.some(val => String(val.id) === String(id) && val.email === dataSesi.email
-    );
+    const isJoined = dataSesi ? joinedCommunity.some(val => String(val.id) === String(id) && val.email === dataSesi.email) : false;
 
     //kita buat fungsi untuk ngehandle ketika ingin ditambah maupun dihapus dari katalog join community
     const handleJoin = () => {
@@ -48,9 +49,11 @@ function EventCommunities({id, title, desc, type, member, agenda, pict}) {
         localStorage.setItem('joinCommunity', JSON.stringify(updateEvents));
         setJoinedCommunity(updateEvents);
     }
+
+    const {theme} = useContext(themeContext);
   return (
     <>
-        <article className="flex flex-col h-full border border-gray-100 shadow-xl rounded-xl overflow-hidden">
+        <article className={`flex flex-col h-full border ${theme === 'light' ? 'border-gray-100': 'border-gray-800 shadow-sm shadow-gray-900'} shadow-xl rounded-xl overflow-hidden`}>
             <div className="relative">
                 <img
                     src={pict}
@@ -63,8 +66,8 @@ function EventCommunities({id, title, desc, type, member, agenda, pict}) {
             </div>
             <div className="flex flex-col flex-1 p-4">
                 <Link to={`/communities/${id}/${slug}`}>
-                    <p className="text-md text-gray-900 font-medium">{title}</p>
-                    <p className="text-xs text-gray-500 mt-1 flex-1 leading-5">{desc}</p>
+                    <p className={`text-md ${theme === 'light' ? 'text-gray-900' : "text-gray-300"} font-medium`}>{title}</p>
+                    <p className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} mt-1 flex-1 leading-5`}>{desc}</p>
                     <div className="flex flex-wrap gap-1 mt-3">
                         {type.map((val) => (
                         <span
@@ -76,7 +79,7 @@ function EventCommunities({id, title, desc, type, member, agenda, pict}) {
                     ))}
                     </div>
 
-                    <div className="flex flex-wrap text-xs text-gray-500 gap-4 mt-3">
+                    <div className={`flex flex-wrap text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} gap-4 mt-3`}>
                         <div className="flex items-center gap-1">
                             <IoPeopleOutline />
                             <span>{member} members</span>

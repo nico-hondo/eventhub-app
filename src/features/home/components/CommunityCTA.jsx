@@ -1,8 +1,8 @@
-function CommunityCTA() {
+function CommunityCTA({theme}) {
   return (
     <>
         <section className="w-full min-h-75 flex justify-center items-center">
-            <div className="max-w-6xl flex-1 flex justify-center items-center bg-black rounded-xl">
+            <div className={`max-w-6xl flex-1 flex justify-center items-center ${theme === 'light' ? 'bg-black' : 'bg-gray-800'} rounded-xl`}>
                 <div className="max-w-2xl flex flex-col justify-center items-center gap-4 my-8">
                     <div className="flex gap-2 text-xs font-medium">
                         <div className="w-20 h-7 flex justify-center items-center text-blue-700 bg-blue-600/20 rounded-full">
@@ -19,7 +19,7 @@ function CommunityCTA() {
                     <p className="text-xs text-gray-400 text-center">Join thousands of developers, designers, and makers in Indonesia's <span className="block">most active tech communities.</span></p>
                     <div className="flex gap-3 text-sm font-medium">
                         <span className="text-gray-200 bg-orange-600 rounded-lg px-5 py-3 cursor-pointer">Explore Events</span>
-                        <span className="border border-gray-400 rounded-lg text-gray-200 px-5 py-3 cursor-pointer">Browse Communities</span>
+                        <span className={`border ${theme === 'light' ? 'border-gray-400' : 'border-gray-600'} rounded-lg text-gray-200 px-5 py-3 cursor-pointer`}>Browse Communities</span>
                     </div>
                 </div>
             </div>

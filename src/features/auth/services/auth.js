@@ -15,5 +15,5 @@ export function getRole(){
 }
 
 export function logout(){
-    localStorage.removeItem('session')
+    localStorage.removeItem('session');
 }

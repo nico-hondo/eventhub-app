@@ -1,7 +1,7 @@
 import communities from '../../../data/communities.json';
 import EventCommunities from '../../../components/communities/EventCommunities';
 
-function CommunityList() {
+function CommunityList({theme}) {
     const filter = ['All Categories', 'Technology', 'Design', 'Business', 'Career', 'AI', 'Programming', 'Music'];
 
     const lengthListCommunity = communities.length;
@@ -9,7 +9,7 @@ function CommunityList() {
         <section className="w-full flex justify-center items-center">
             <div className="max-w-6xl flex-1 flex flex-col gap-10 py-6">
                 <div className="flex gap-4">
-                    <div className="flex gap-2 p-1 text-xs font-medium border border-gray-200 rounded-lg">
+                    <div className={`flex gap-2 p-1 text-xs font-medium border ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'} rounded-lg`}>
                         <span className="text-gray-200 px-3 py-1.5 bg-orange-600 rounded-md cursor-pointer">All</span>
                         <span className="text-gray-700 px-3 py-1.5 rounded-md cursor-pointer">Joined</span>
                         <span className="text-gray-700 px-3 py-1.5 rounded-md cursor-pointer">Not Joined</span>
@@ -18,8 +18,8 @@ function CommunityList() {
                     <div className="flex gap-2 text-xs font-medium">
                         {filter.map((val) => {
                             return(
-                                <div key={val} className="flex justify-center items-center gap-2 text-gray-200 text-center">
-                                    <span className="bg-orange-600 rounded-md px-3 py-1 cursor-pointer">{val}</span>
+                                <div key={val} className={`flex justify-center items-center gap-2 ${theme === 'light' ? 'text-gray-800' : "text-gray-200"} text-center`}>
+                                    <span className="rounded-md px-3 py-1 cursor-pointer">{val}</span>
                                 </div>
                             )
                         })}

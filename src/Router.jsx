@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router";
+import { Routes, Route, Link } from "react-router";
 import HomePage from "./features/home/pages/HomePage.jsx";
 import EventPage from "./features/event/pages/EventPage.jsx";
 import CommunityPage from "./features/community/pages/CommunityPage.jsx";
@@ -20,11 +20,25 @@ import CommunityDetailDiscuss from "./features/community/pages/CommunityDetailDi
 import CommunityDetailMembers from "./features/community/pages/CommunityDetailMembers.jsx";
 import CommunityDetailUpcomingEv from "./features/community/pages/CommunityDetailUpcomingEv.jsx";
 
+//notification - pages
+import NotifLayout from "./features/notification/component/NotifLayout.jsx";
+import AllNotif from "./features/notification/page/AllNotif.jsx";
+import UnReadNotif from "./features/notification/page/UnReadNotif.jsx";
+import { IoIosArrowRoundForward } from "react-icons/io";
+
 //profile - pages
 import ProfileLayout from "./features/profile/components/ProfileLayout.jsx";
 import ProfileEvents from "./features/profile/pages/ProfileEvents.jsx";
 import ProfileCommunity from "./features/profile/pages/ProfileCommunity.jsx";
 import ProfileSaved from "./features/profile/pages/ProfileSaved.jsx";
+
+//dashboard - organizer
+import Dashboard from "./features/organizer/pages/Dashboard.jsx";
+import CreateEvent from "./features/organizer/pages/CreateEvent.jsx";
+import BasicInformationCreate from "./features/organizer/components/BasicInformationCreate.jsx";
+import DetailCreate from "./features/organizer/components/DetailCreate.jsx";
+import SpeakerAndReview from "./features/organizer/components/SpeakerAndReview.jsx";
+import FinishCreated from "./features/organizer/components/FinishCreated.jsx";
 
 function Router() {
   return (
@@ -48,19 +62,49 @@ function Router() {
           <Route path="past-event" element={<PastEvent/>}/>
           <Route path="saved-event" element={<SavedEvent/>}/>
         </Route>
+        <Route path="notification" element={<NotifLayout/>}>
+          <Route index element={<AllNotif/>}/>
+          <Route path="unread" element={<UnReadNotif/>}/>
+        </Route>
         <Route path="profile" element={<ProfileLayout/>}>
           <Route index element={<ProfileEvents/>}/>
           <Route path="community" element={<ProfileCommunity/>}/>
           <Route path="saved" element={<ProfileSaved/>}/>
         </Route>
+        <Route path="dashboard">
+          <Route index element={<Dashboard/>}/>
+          <Route path="create-event" element={<CreateEvent/>}> 
+            <Route index element={<BasicInformationCreate/>}/>
+            <Route path="detail" element={<DetailCreate/>}/>
+            <Route path="review" element={<SpeakerAndReview/>}/>
+            <Route path="success" element={<FinishCreated/>} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFoundPage/>}/>
       </Route>
       <Route path="auth">
           <Route index element={<SignIn/>}/>
-          <Route path="sign-up" element={<SignUp/>}/>
+          <Route path="/auth/register" element={<SignUp role="attendee" />} />
+          <Route path="/auth/register-organizer" element={<SignUp role="organizer" />} />
           <Route path="forgot-pass" element={<ForgotPass/>} />
       </Route>
     </Routes>
   );
+}
+
+function NotFoundPage(){
+  return(
+    <>
+      <div className="flex flex-col gap-4 items-center justify-center h-screen">
+        <p className="text-orange-600 font-bold">404</p>
+        <p className="text-xl text-gray-900 font-bold">Page not found</p>
+        <p className="text-sm text-gray-700">Sorry, we couldn’t find the page you’re looking for</p>
+        <Link to="/">
+          <button className="flex items-center gap-2 text-xs text-orange-600 cursor-pointer"><IoIosArrowRoundForward className="text-lg rotate-180"/> Back to home</button>
+        </Link>
+      </div>
+    </>
+  )
 }
 
 export default Router;

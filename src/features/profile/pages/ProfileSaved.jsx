@@ -46,8 +46,7 @@ function ProfileSaved() {
     if (!currentUser) {
         return (
             <div className="text-center py-10">
-                <p className="text-gray-500">Please login to see your saved events</p>
-                <Link to="/login" className="text-orange-600 underline">Go to Login</Link>
+                <p className="text-gray-500">Loading....</p>
             </div>
         )
     }
@@ -56,7 +55,7 @@ function ProfileSaved() {
     <>
 
       {userBookmark.length === 0 ?
-          (<section className="w-full min-h-100 flex justify-center items-center py-6">
+          (<section className="w-full min-h-100 flex justify-center items-center pt-2">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <IoBookmark className="text-gray-900 text-4xl"/>
               <div className="flex flex-col text-xs gap-1 text-center">
