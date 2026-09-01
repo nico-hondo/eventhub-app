@@ -20,7 +20,7 @@ function Communities() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-400">
-                          <span className="bg-green-200 text-green-600 text-[11px] rounded-lg px-2">active</span>
+                          <span className="bg-green-200 text-green-600 text-[11px] rounded-lg px-2 capitalize">active</span>
                          
                           <SlOptions className="cursor-pointer"/>
                         </div>

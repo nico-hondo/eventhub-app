@@ -1,14 +1,63 @@
-import { useState } from 'react';
+// import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import AuthSidePanel from "../components/AuthSidePanel";
-import handleLogin from '../validation/handleLogin';
+import { useDispatch, useSelector } from 'react-redux';
+import { findAttendeeUser, findDefaultUser } from '../validation/handleAuth';
+import { loginUser } from '../../../redux/slices/authSlice';
 
 function SignIn() {
-    const [validate, setValidate] = useState("");
+    const { register, handleSubmit, setError, formState: {  errors, isSubmitting } } = useForm({
+        defaultValues: { email: "", password: "" },
+    });
+    
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const getUser = useSelector((state) => state.registState.registeredUser)
+
+    // console.log(getUser);
+
+    const onSubmit = async (data) => {
+        const { email, password } = data;
+        const defaultUser = findDefaultUser(email, password);
+
+        const session = defaultUser
+            ? {
+                nama: defaultUser.nama,
+                email: defaultUser.email,
+                role: defaultUser.role,
+                token: 1,
+            }
+            : (() => {
+                const foundUser = findAttendeeUser(email, password, getUser);
+                // console.log(foundUser);
+                if (!foundUser) {
+                    setError("email", { message: "Email atau password salah" });
+                    setError("password", { message: "Email atau password salah" });
+                    return null;
+                }
+
+                return {
+                    nama: foundUser.name,
+                    email: foundUser.email,
+                    role: foundUser.role || "attendee",
+                    token: 1,
+                };
+            })();
+
+        if (!session) return;
+
+        try {
+            await dispatch(loginUser(session)).unwrap();
+            navigate("/");
+        } catch (err) {
+            setError("email", { message: typeof err === "string" ? err : "Login gagal" });
+        }
+    };
+    console.log(errors)
   return (
         <div className="w-full h-screen flex flex-row">
             <AuthSidePanel/>
@@ -22,71 +71,62 @@ function SignIn() {
                         <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer"><FaGoogle className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Google</span></div>
                         <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer"><FaGithub className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Github</span></div>
                     </div>
-                     <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                         <div className="h-px bg-gray-200 flex-1"></div>
                         <p className="text-xs text-gray-400">or continue with email</p>
                         <div className="h-px bg-gray-200 flex-1"></div>
                     </div>
-                    <form className="grid gap-4"
-                        onSubmit = {(e) => {
-                            e.preventDefault();
-
-                            const email = e.target.email.value;
-                            const pass = e.target.password.value;
-
-                            const user = {email, pass};
-
-                            //kita get data dari local
-                            const getUser = JSON.parse(localStorage.getItem('users') || []);
-
-                            const err = handleLogin(user, getUser);
-
-                            setValidate(err);
-
-                            if(Object.keys(err).length > 0){
-                                console.log(err);
-                                return;
-                            }
-
-                            const foundUser = getUser.find(
-                                (item) => item.email === email
-                            )
-
-                            const session = {
-                                nama: foundUser.nama,
-                                email: foundUser.email,
-                                role: foundUser.role,
-                                token: 1,
-                            }
-
-                            localStorage.setItem('session', JSON.stringify(session));
-                            console.log(session);
-
-                            e.target.reset();
-                            
-                            navigate('/');
-                        }}
-                    >
+                    <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="email" className="text-sm font-medium text-gray-500">Email address</label>
                             <div>
-                                <input type="text" name="email" id="email" placeholder="nicohondo01@gmail.com" className={`w-90 border p-2.5 rounded-lg text-xs ${validate.email ? "border-red-500" : "border-gray-300"}`}/>
-                                {validate.email && (<p className="text-red-500 text-[11px]">{validate.email}</p>)}
+                                <input
+                                    type="text"
+                                    id="email"
+                                    placeholder="nicohondo01@gmail.com"
+                                    className={`w-90 border p-2.5 rounded-lg text-xs focus:outline-none ${errors.email ? "border-red-500" : "border-gray-300"}`}
+                                    {...register("email", {
+                                        required: "Email wajib diisi",
+                                        pattern: {
+                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                            message: "Format email tidak valid",
+                                        },
+                                    })}
+                                />
+                                {errors.email && (<p className="text-red-500 text-[11px]">{errors.email.message}</p>)}
                             </div>
                         </div>
                         <div className="grid gap-2">
                             <div className="flex justify-between items-center">
-                                <label htmlFor="pass" className="text-sm font-medium text-gray-500">Password</label>
+                                <label htmlFor="password" className="text-sm font-medium text-gray-500">Password</label>
                                 <span className="text-orange-500 text-xs font-normal cursor-pointer"><Link to={"/auth/forgot-pass"}>Forgot Password?</Link></span>
                             </div>
                             <div>
-                                <input type="password" name="password" id="pass" placeholder="Your Password" className={`w-90 border p-2.5 rounded-lg text-xs ${validate.pass ? "border-red-500" : "border-gray-300"}`}/>
-                                {validate.pass && (<p className="text-red-500 text-[11px]">{validate.pass}</p>)}
+                                <input
+                                    type="password"
+                                    id="password"
+                                    placeholder="Your Password"
+                                    className={`w-90 border p-2.5 rounded-lg text-xs focus:outline-none ${errors.password ? "border-red-500" : "border-gray-300"}`}
+                                    {...register("password", {
+                                        required: "Password wajib diisi",
+                                        minLength: {
+                                            value: 6,
+                                            message: "Password minimal 6 karakter",
+                                        },
+                                    })}
+                                />
+                                {errors.password && (<p className="text-red-500 text-[11px]">{errors.password.message}</p>)}
                             </div>
                         </div>
-                        <button type="submit" className="w-full p-2.5 bg-orange-600 text-sm font-medium text-white rounded-lg cursor-pointer">Sign in</button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full p-2.5 bg-orange-600 text-sm font-medium text-white rounded-lg cursor-pointer disabled:opacity-60"
+                        >
+                            {isSubmitting ? "Signing in..." : "Sign in"}
+                        </button>
                     </form>
-                    <p className="text-xs text-gray-400 text-center">Just browsing? <span className="underline cursor-pointer">Continue as guest &#8594;</span></p>
+                    <p className="text-xs text-gray-400 text-center">Just browsing? <Link to="/" className="underline cursor-pointer">Continue as guest &#8594;</Link></p>
                 </div>
             </main>
         </div>

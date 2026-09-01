@@ -1,55 +1,73 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router";
 
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import AuthSidePanel from "../components/AuthSidePanel";
 import { Link } from "react-router";
-import validateRegister from "../validation/registerValidation";
-// import Alert from "../components/Alert";
+import { useDispatch, useSelector } from "react-redux";
+import { registerThunk } from "../../../redux/slices/registerSlice";
 
-const ORGANIZER_EMAIL = import.meta.env.VITE_ORGANIZER_EMAIL;
+function SignUp() {
+    const {register, handleSubmit, setError, formState: { errors }} = useForm();
 
-function SignUp({ role = "attendee" }) {
-    const [error, setError] = useState("");
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const isOrganizer = role === "organizer";
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleRegist = (e) => {
-        e.preventDefault();
+    const registeredUsers = useSelector((state) => state.registState.registeredUser);
 
-        const nama = e.target.name.value;
-        const email = e.target.email.value;
-        const pass = e.target.password.value;
-        const confPass = e.target.confpass.value;
-        const useTerms = e.target.terms.checked;
+    const onSubmit = async (data) => {
+        const { name, email, password, confPass } = data;
 
-        const validateUser = { nama, email, pass, confPass, useTerms, role };
-        const objUser = { nama, email, pass, useTerms, role };
-
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-
-        const err = validateRegister(validateUser, users);
-
-        // khusus organizer: email wajib cocok sama yang di-whitelist developer (.env)
-        if (isOrganizer && email !== ORGANIZER_EMAIL) {
-            err.email = "Email ini tidak terdaftar sebagai organizer. Hubungi admin untuk didaftarkan.";
-        }
-
-        setError(err);
-
-        if (Object.keys(err).length > 0) {
-            console.log(err);
+        if(password !== confPass){
+            setError('confPass', {
+                type: 'manual',
+                message: 'Password not match',
+            });
             return;
         }
 
-        const addUser = [...users, objUser];
-        localStorage.setItem("users", JSON.stringify(addUser));
+        if(registeredUsers.some(user => user.email === email)){
+            setError('email', {
+                type: 'manual',
+                message: 'Email already registered'
+            });
+            return;
+        }
 
-        e.target.reset();
-        navigate('/auth');
+        const newUser = {
+            name,
+            email,
+            password,
+            role: 'attendee',
+            img: 'D:/Lamaran Kerja/KODA/Week05/koda-b9-eventhub/public/img/img-profile.jpg',
+            community_id: [],
+            events_id: [],
+        }
+
+        try{
+            await dispatch(registerThunk(newUser)).unwrap();
+            navigate('/auth')
+        }catch(err){
+            setError('email', {message: err ? err : 'Registrasi Gagal, coba lagi'});
+        }
+        
     }
+
+    const process = useSelector(state => state.registState);
+
+    useEffect(() => {
+        (() => {
+            if(process.isPending){
+                setIsLoading(true);
+            }else{
+                setIsLoading(false);
+            }
+        })();
+    }, [process])
 
     return (
         <div className="w-full h-screen flex flex-row">
@@ -58,7 +76,7 @@ function SignUp({ role = "attendee" }) {
                 <div className="max-w-5xl grid gap-4">
                     <div className="grid gap-2">
                         <h3 className="font-medium text-2xl text-bold text-black">
-                            {isOrganizer ? "Create Your Organizer Account" : "Create Your Account"}
+                           "Create Your Account"
                         </h3>
                         <p className="text-gray-500 text-xs">
                             Already have an account?{" "}
@@ -68,53 +86,74 @@ function SignUp({ role = "attendee" }) {
                         </p>
                     </div>
 
-                    {!isOrganizer && (
-                        <>
-                            <div className="w-full flex justify-between gap-2">
-                                <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer">
-                                    <FaGoogle className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Google</span>
-                                </div>
-                                <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer">
-                                    <FaGithub className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Github</span>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="h-px bg-gray-200 flex-1"></div>
-                                <p className="text-xs text-gray-400">or continue with email</p>
-                                <div className="h-px bg-gray-200 flex-1"></div>
-                            </div>
-                        </>
-                    )}
+                   
+                    <div className="w-full flex justify-between gap-2">
+                        <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer">
+                            <FaGoogle className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Google</span>
+                        </div>
+                        <div className="w-full flex gap-2 justify-center items-center px-5 py-2 border border-gray-400 rounded-lg cursor-pointer">
+                            <FaGithub className="w-3 h-3"/><span className="text-gray-600 text-xs font-medium">Github</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="h-px bg-gray-200 flex-1"></div>
+                        <p className="text-xs text-gray-400">or continue with email</p>
+                        <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
 
-                    <form onSubmit={handleRegist} className="grid gap-2">
+                    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-2">
                         <div className="flex flex-col gap-2">
                             <label htmlFor="name" className="text-sm font-medium text-gray-500">Full Name</label>
                             <div>
-                                <input type="text" name="name" id="name" placeholder="Nico Hondo" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 ${error.nama ? "border-red-500" : "border-gray-300"}`}/>
-                                {error.nama && (<p className="text-red-500 text-[11px]">{error.nama}</p>)}
+                                <input type="text" name="name" id="name" placeholder="Nico Hondo" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.name ? "border-red-500" : "border-gray-300"}`}
+                                {...register('name', {
+                                    required: 'Name is required'
+                                })}
+                                />
+                                {errors.name && (<p className="text-red-500 text-[11px]">{errors.name.message}</p>)}
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="email" className="text-sm font-medium text-gray-500">
-                                {isOrganizer ? "Organizer Email" : "Email address"}
+                                Email address
                             </label>
                             <div>
-                                <input type="text" name="email" id="email" placeholder={isOrganizer ? "organizer01@gmail.com" : "nicohondo01@gmail.com"} className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 ${error.email ? "border-red-500" : "border-gray-300"}`}/>
-                                {error.email && (<p className="text-red-500 text-[11px]">{error.email}</p>)}
+                                <input type="text" name="email" id="email" placeholder= "nicohondo01@gmail.com" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.email ? "border-red-500" : "border-gray-300"}`}
+                                {...register('email', {
+                                    required: 'Email is required',
+                                })}
+                                />
+                                {errors.email && (<p className="text-red-500 text-[11px]">{errors.email.message}</p>)}
                             </div>
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="pass" className="text-sm font-medium text-gray-500">Password</label>
                             <div>
-                                <input type="password" name="password" id="pass" placeholder="At least 8 characters" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 ${error.pass ? "border-red-500" : "border-gray-300"}`}/>
-                                {error.pass && (<p className="text-red-500 text-[11px]">{error.pass}</p>)}
+                                <input type="password" name="password" id="pass" placeholder="At least 8 characters" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.password ? "border-red-500" : "border-gray-300"}`}
+                                {...register('password', {
+                                    required: 'Password is required',
+                                    minLength: {
+                                        value: 6,
+                                        message: 'Password must be a minimal 6 characters',
+                                    },
+                                })}
+                                />
+                                {errors.password && (<p className="text-red-500 text-[11px]">{errors.password.message}</p>)}
                             </div>
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="confpass" className="text-sm font-medium text-gray-500">Confirm Password</label>
                             <div>
-                                <input type="password" name="confpass" id="confpass" placeholder="Re-enter your password" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 ${error.confPass ? "border-red-500" : "border-gray-300"}`}/>
-                                {error.confPass && (<p className="text-red-500 text-[11px]">{error.confPass}</p>)}
+                                <input type="password" name="confpass" id="confpass" placeholder="Re-enter your password" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.confPass ? "border-red-500" : "border-gray-300"}`}
+                                {...register('confPass', {
+                                    required: '',
+                                    minLength: {
+                                        value: 6,
+                                        message: 'Password must be a minimal 6 characters',
+                                    }
+                                })}
+                                />
+                                {errors.confPass && (<p className="text-red-500 text-[11px]">{errors.confPass.message}</p>)}
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -143,13 +182,17 @@ function SignUp({ role = "attendee" }) {
                                 checked:after:opacity-100
                                 after:transition-opacity
                             "
+                            {...register('accTerms', {
+                                required: 'Must accept our terms and condition'
+                            })}
                             />
                             <label htmlFor="terms" className="text-xs">
                                 I agree to the <span className="text-orange-500 cursor-pointer">Terms of Service</span> and <span className="text-orange-600 cursor-pointer">Privacy Policy</span>
                             </label>
                         </div>
+                        {errors.accTerms && (<p className="text-red-500 text-[11px]">{errors.accTerms.message}</p>)}
                         <button type="submit" className="w-full p-2.5 bg-orange-600 text-sm font-medium text-white rounded-lg cursor-pointer">
-                            {isOrganizer ? "Register as Organizer" : "Create Account"}
+                            {isLoading ? 'loading' : "Create Account"}
                         </button>
                     </form>
                 </div>

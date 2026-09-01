@@ -1,16 +1,17 @@
 import Navbar from "./header/Navbar";
-import { useState } from "react";
 import { Outlet } from "react-router";
-import { getSession, logout } from "../../features/auth/services/auth";
-// import { getRole } from "../../features/auth/services/auth";
+// import { getSession, logout } from "../../features/auth/services/auth";
+import { logout as logoutAction } from "../../redux/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectSession, selectRole } from "../../features/auth/store/authSelectors";
 
 function MainLayout() {
-    const [session, setSession] = useState(getSession());
-    const role = session?.role ?? "guest";
+    const dispatch = useDispatch();
+    const session = useSelector(selectSession);
+    const role = useSelector(selectRole);
 
     function handleLogout() {
-        logout();
-        setSession(null);
+        dispatch(logoutAction())
     }
     return (
         <>

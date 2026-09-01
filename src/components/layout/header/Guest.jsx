@@ -38,7 +38,11 @@ function Guest() {
                             />
                         )
                     }
-                    <span className="bg-orange-600 text-gray-100 text-xs font-medium rounded-md px-3 py-2 cursor-pointer"><Link to="/auth">Sign In</Link></span>
+                    <Link to="/auth">
+                        <span className="bg-orange-600 text-gray-100 text-xs font-medium rounded-md px-3 py-2 cursor-pointer">
+                            Sign In
+                        </span>
+                    </Link>
                 </div>
             </div>
         </header>
