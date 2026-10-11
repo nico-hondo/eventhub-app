@@ -24,7 +24,7 @@ function ModalIcon({session, onClose, onLogout, excludeRef}) {
     return (
         <div ref={modalRef} className={`w-40 flex flex-col gap-3 border border-gray-300 rounded-xl px-4 py-4 fixed top-12 right-7 z-60 bg-white shadow-md`}> 
             <div className="w-full border-b border-gray-200 pb-2 flex flex-col cursor-pointer">
-                <span className="text-[15px] text-gray-900 font-bold leading-1 pt-2">{session.nama}</span>
+                <span className="text-[15px] text-gray-900 font-bold leading-1 pt-2">{session.name}</span>
                 <span className="text-[13px] text-gray-400">{session.email}</span>
                 <span className="px-3 py- bg-orange-400 w-fit rounded-lg text-[12px] text-orange-100 capitalize">{session.role}</span>
             </div>

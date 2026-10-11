@@ -1,26 +1,38 @@
-// import { useEffect, useState } from "react";
-import { useParams } from "react-router"
-import events from '../../../data/events.json';
+import { useParams } from "react-router";
 import BreadCrumb from "../../../components/common/BreadCrumb";
 import DetailContent from "../component/DetailContent";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchEventById } from "../../../redux/slices/eventSlice";
 
 function DetailEvent() {
-    const {id} = useParams();
+    const { id } = useParams();
+    const dispatch = useDispatch();
 
-    const foundEvent = events.find(
-        (event) => event.id === id
-    );
+    useEffect(() => {
+        if (id){
+            dispatch(fetchEventById(id))
+        }
+    }, [dispatch, id]);
 
-    if(!foundEvent){
-        return <div className="text-center mt-10">Event not found</div>
+    // Ambil eventDetail dan status loading dari Redux
+    const { eventDetail, isLoading, error } = useSelector((state) => state.events);
+
+    console.log(eventDetail);
+    if (isLoading) {
+        return <div className="text-center mt-10">Loading detail event...</div>;
     }
 
-  return (
-    <>
-        <BreadCrumb isString={"events"}/>
-        <DetailContent data={foundEvent}/>
-    </>
-  )
+    if (error || !eventDetail) {
+        return <div className="text-center mt-10">Event not found</div>;
+    }
+
+    return (
+        <>
+            <BreadCrumb isString={"events"} />
+            <DetailContent data={eventDetail} />
+        </>
+    );
 }
 
-export default DetailEvent
+export default DetailEvent;

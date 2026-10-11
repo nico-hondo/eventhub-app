@@ -1,23 +1,13 @@
 import { NavLink, Outlet } from "react-router"
+import { useSelector } from "react-redux"
+import { selectSession, selectUser } from "../../auth/store/authSelectors"
 
 function TabContent({theme}) {
 
-  const session = localStorage.getItem('session');
-  const dataSesi = JSON.parse(session);
+  const session = useSelector(selectSession);
+  const users = useSelector(selectUser);
 
-  const dataBook = localStorage.getItem('bookEvent');
-  const bookEvent = JSON.parse(dataBook);
-
-  const findBook = bookEvent.filter((val) => {
-      return val.email === dataSesi.email;
-  })
-  const dataJoinEvent = localStorage.getItem('joinEvent');
-  const dataEvent = JSON.parse(dataJoinEvent);
-
-  const joinEvent = dataEvent.filter(val => val.email === dataSesi.email)
-
-  const countBook = findBook.length;
-
+  const user = users.filter((val) => val.email === session.email);
   // console.log(countBook)
   return (
     <section className="w-full flex-1 flex flex-col gap-6 justify-center items-center sticky top-14 z-40">
@@ -26,13 +16,13 @@ function TabContent({theme}) {
         <div className="flex gap-3 text-xs text-gray-400">
           <NavLink end to="" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
-          }>Upcoming <span>{`(${joinEvent.length})`}</span></NavLink>
+          }>Upcoming <span>{`(${user[0].events_id === 0 ? '0' : user[0].events_id.length})`}</span></NavLink>
           <NavLink end to="past-event" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
           }>Past <span>{`(0)`}</span></NavLink>
           <NavLink end to="saved-event" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
-          }>Saved <span>{`(${countBook})`}</span></NavLink>
+          }>Saved <span>{`(${user[0].saved_events_id === 0 ? '0' : user[0].events_id.length})`}</span></NavLink>
         </div>
       </div>
 

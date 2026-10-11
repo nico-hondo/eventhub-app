@@ -1,56 +1,35 @@
-import { useState, useMemo, useContext } from "react";
-import { Link } from "react-router";
+import { useContext } from "react";
+// import { Link } from "react-router";
 
 // import events from '../../../data/events.json';
 import EventDiscover from '../../../components/event/EventDiscover';
 import events from '../../../data/events.json';
 import { convertDate } from '../../../components/utils/utilitas';
 import themeContext from "../../../context/theme/themeContext";
+import { useSelector } from "react-redux";
+import { selectSession, selectUser } from "../../auth/store/authSelectors";
 
 function ProfileEvents() {
 
     const {theme} = useContext(themeContext);
-    const session = localStorage.getItem('session');
-    const dataSesi = JSON.parse(session);
-
-    const [dataEvent] = useState(() => {
-    const joinEvent = localStorage.getItem('joinEvent');
-    return joinEvent? JSON.parse(joinEvent) : [];
-  })
-
-  // 1. Ambil id event milik user yg login doang
-  const userJoinedIds = useMemo(() => {
-    return dataEvent
-     .filter(ev => String(ev.email) === String(dataSesi.email)) // filter punya user ini
-     .map(ev => String(ev.id)) // ambil id nya aja
-  }, [dataEvent, dataSesi.email])
-
-  // 2. Join ke data store events.json
-  const userJoinEvent = useMemo(() => {
-    return events.filter(event => userJoinedIds.includes(String(event.id)))
-  }, [userJoinedIds])
-
-  console.log("ID yg dijoin:", userJoinedIds);
-  console.log("Data lengkap:", userJoinEvent);
-
-  if(!session){
-    return
-  }
+    const session = useSelector(selectSession);
+    const users = useSelector(selectUser);
   
-  // Kalau belum login
-    if (!dataSesi) {
-        return (
-            <div className="text-center py-10">
-                <p className="text-gray-500">Please login to see your saved events</p>
-                <Link to="/login" className="text-orange-600 underline">Go to Login</Link>
-            </div>
-        )
+    const user = users.filter((val) => val.email === session?.email);
+  
+    // guard: session/user belum siap (misal persist belum rehydrate) -> jangan lanjut proses
+    if (!session?.email || user.length === 0) {
+      return null; // atau tampilin loading skeleton
     }
+    
+    const joinedEventIds = user[0]?.events_id ?? [];
+    const joinedData = events.filter((val) => joinedEventIds.includes(val.id));
+  
 
   return (
     <>
 
-      {userJoinEvent.length === 0 ?
+      {joinedData.length === 0 ?
           (<section className="w-full min-h-100 flex justify-center items-center py-6">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <div className="flex flex-col text-xs gap-1 text-center">
@@ -64,8 +43,8 @@ function ProfileEvents() {
           <>
             <div className="flex flex-col gap-4">
               <span className={`text-xs font-medium uppercase ${theme === 'light' ? 'text-gray-800' : 'text-gray-300'}`}>upcoming</span>
-              <div className="grid grid-rows-2 grid-cols-3 gap-5">
-                {userJoinEvent.map((val) => {
+              <div className="grid grid-cols-3 gap-5">
+                {joinedData.map((val) => {
                   return(
                     <EventDiscover 
                       key={`${val.id}-${val.email}`}

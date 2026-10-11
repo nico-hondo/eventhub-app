@@ -1,60 +1,33 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { IoBookmark } from "react-icons/io5";
-import { Link } from "react-router";
+// import { Link } from "react-router";
 
-// import events from '../../../data/events.json';
+import events from '../../../data/events.json';
 import EventDiscover from '../../../components/event/EventDiscover';
 import { convertDate } from '../../../components/utils/utilitas';
+import { useSelector } from "react-redux";
+import { selectSession, selectUser } from "../../auth/store/authSelectors";
 
 function ProfileSaved() {
-  const [userBookmark, setUserBookmark] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const session = useSelector(selectSession);
+  const users = useSelector(selectUser);
 
-  useEffect(() => {
-    const session = localStorage.getItem('session');
-    if(!session){
-      // setCurrentUser(null);
-      return
-    }
-    const dataSesi = JSON.parse(session);
-    setCurrentUser(dataSesi);
+  const user = users.filter((val) => val.email === session?.email);
 
-    const currentBookEvent = JSON.parse(localStorage.getItem('bookEvent')) || [];
-
-    const bookEvent = currentBookEvent.filter(ev => ev.email === dataSesi.email);
-
-    setUserBookmark(bookEvent);
-  }, [])
-  
-  // Dipanggil dari EventDiscover pas tombol bookmark diklik
-  const handleUnbookmark = (id) => {
-    if (!currentUser) return;
-
-    //ambil data di localStorage yang terbaru
-    const currentBookEvent = JSON.parse(localStorage.getItem('bookEvent')) || [];
-
-    const updatedAll = currentBookEvent.filter(
-      ev => !(ev.id === id && ev.email === currentUser.email)
-    );
-    localStorage.setItem('bookEvent', JSON.stringify(updatedAll));
-
-    // 2. Update state React - biar langsung re-render
-    setUserBookmark(prev => prev.filter(ev => ev.id !== id));
+  // guard: session/user belum siap (misal persist belum rehydrate) -> jangan lanjut proses
+  if (!session?.email || user.length === 0) {
+    return null; // atau tampilin loading skeleton
   }
+  
+  const savedEventIds = user[0]?.saved_events_id ?? [];
+  const savedData = events.filter((val) => savedEventIds.includes(val.id));
 
-  // Kalau belum login
-    if (!currentUser) {
-        return (
-            <div className="text-center py-10">
-                <p className="text-gray-500">Loading....</p>
-            </div>
-        )
-    }
+  // console.log(savedEventIds, savedData);
 
   return (
     <>
 
-      {userBookmark.length === 0 ?
+      {savedData.length === 0 ?
           (<section className="w-full min-h-100 flex justify-center items-center pt-2">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <IoBookmark className="text-gray-900 text-4xl"/>
@@ -69,7 +42,7 @@ function ProfileSaved() {
          (
           <section className="grid grid-cols-3 gap-4">
 
-          {userBookmark.map((val) => {
+          {savedData.map((val) => {
             return(
               <EventDiscover 
                 key={`${val.id}-${val.email}`}
@@ -77,12 +50,11 @@ function ProfileSaved() {
                 type={val.tags}
                 title={val.title}
                 date={convertDate(val.date)}
-                hour={val.hour}
-                at={val.at}
-                participant={val.participant}
-                slot={val.slot}
-                pict={val.pict}
-                unBookMark={handleUnbookmark}
+                hour={val.start_time}
+                at={val.location}
+                participant={val.attendees_count}
+                slot={val.capacity}
+                pict={val.image_url}
               />
             )
           })}

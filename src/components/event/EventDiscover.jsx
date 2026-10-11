@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect} from "react";
 import { CiCalendar } from "react-icons/ci";
 import { IoLocationOutline } from "react-icons/io5";
 import { IoPeopleOutline } from "react-icons/io5";
@@ -11,24 +11,35 @@ import { Link, useNavigate } from "react-router";
 import slugify from 'slugify';
 import themeContext from "../../context/theme/themeContext";
 
+import { useDispatch, useSelector } from "react-redux";
+import { selectSession, selectRole, selectUser } from "../../features/auth/store/authSelectors";
+import {joinEventThunk} from "../../redux/slices/registerSlice";
+import { fetchSavedEvents, saveEventThunk } from "../../redux/slices/eventSlice";
+import {toast} from "react-toastify";
+import { fetchMyEvents } from "../../redux/slices/eventSlice";
+
 function EventDiscover({id, type, title, date, hour, at, participant, slot, pict}) {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchMyEvents())
+        dispatch(fetchSavedEvents())
+    }, [dispatch])
+
+    const session = useSelector(selectSession);
+    const role = useSelector(selectRole);
+    const users = useSelector(selectUser);
+    const user = users.find((val) => val.email === session?.email);
+
+    const {myEvents} = useSelector((state) => state.events) || [];
+    const {saved_events} = useSelector((state) => state.events) || [];
+    // console.log(saved_events);
+
+    const isJoined = myEvents.some((item) => item.id === id);
+    const isSaved = saved_events.some((item) => item.event_id === id);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [joinedEvent, setJoinedEvent] = useState(() => {
-        const joinEvent = localStorage.getItem("joinEvent");
     
-        return joinEvent ? JSON.parse(joinEvent) : [];
-    });
-
-    //bookmark getItem
-    const [bookmarkEvent, setBookmark] = useState(() => {
-        const bookEvent = localStorage.getItem("bookEvent");
-
-        return bookEvent ? JSON.parse(bookEvent) : [];
-    })
-    
-    const session = localStorage.getItem('session');
-    const dataSesi = session ? JSON.parse(session) : null;
-
     const percentage = (participant / slot) * 100;
 
     const slug = slugify(title, {
@@ -36,55 +47,86 @@ function EventDiscover({id, type, title, date, hour, at, participant, slot, pict
         strict: true
     });
 
-    //cek apakah id yang kita tujuh sudah ada di join?
-    const isJoined = dataSesi ? joinedEvent.some(ev => String(ev.id) === String(id) && ev.email === dataSesi.email) : false;
-
-    const isBook = dataSesi ? bookmarkEvent.some(ev => String(ev.id) === String(id) && ev.email === dataSesi.email) : false;
+    //cek apakah id yang kita tuju sudah ada di join?
 
     //hati hati memakai useEffect
     //Jadi ada cascading render: effect berjalan setelah render pertama, lalu langsung memaksa state berubah sehingga terjadi render kedua.
 
     // Padahal localStorage di sini sebenarnya cuma sumber data awal, bukan sesuatu yang perlu disinkronkan terus-menerus menggunakan effect.
 
-    const handleJoin = () => {
-        if(!session) return setIsModalOpen(true);
-
-
-        const newJoinEvent = {id, title, user:dataSesi.nama, email:dataSesi.email, role:dataSesi.role};
-
-        const currentJoinEvent = JSON.parse(localStorage.getItem('joinEvent')) || [];
-
-        const alreadyJoin = currentJoinEvent.some(ev => String(ev.id) === String(id));
-
-        let updateEvents;
-        if(alreadyJoin){
-            //Jika sudah join, maka kita bisa kita klik kembali tombol untuk menghapus dari join
-            updateEvents = currentJoinEvent.filter(val => String(val.id) !== String(id));
-        }else{
-            //ya jika belum maka ditambah, dengan tentunya spread operator
-            updateEvents = [...currentJoinEvent, newJoinEvent];
+    const handleJoin = async () => {
+        if(!session){
+            setIsModalOpen(true);
+            return
         }
-        localStorage.setItem('joinEvent', JSON.stringify(updateEvents));
-        setJoinedEvent(updateEvents); //update state, biar terjadi re-render
+
+        if(role === "organizer" || role === "admin") return;
+
+        const waitPromise = dispatch(joinEventThunk({eventId: id, userId: session.id})).unwrap();
+
+        if (isJoined){
+            toast.promise(
+                waitPromise,{
+                    pending: "UnJoining Event...",
+                    success: "UnJoin Event Successful",
+                    error: "UnJoin Event Failed",
+                },
+                {position: "top-right", autoClose: 900}
+            )
+        }else {
+            toast.promise(
+                waitPromise,{
+                    pending: "Joining Event...",
+                    success: "Join Event Successful",
+                    error: "Join Event Failed",
+                },
+                {position: "top-right", autoClose: 900}
+            )
+        }
+
+        try{
+            await waitPromise;
+            dispatch(fetchMyEvents());
+        }catch(error){
+            console.error("Error joining event:", error);
+        }
     }
 
-    const handleBookmark = () => {
-        if(!session) return setIsModalOpen(true);
+    const handleBookmark = async () => {
+        if(!session){
+            setIsModalOpen(true);
+            return;
+        }
+        if(role === "organizer" || role === "admin") return;
 
-        const tags = type;
-        const newBookmark = {id, tags, title, date, hour, at, participant, slot, pict, email:dataSesi.email, role:dataSesi.role};
+        const waitPromise = dispatch(saveEventThunk({eventId: id, userId: session.id})).unwrap();
 
-        const currentBookmark = JSON.parse(localStorage.getItem('bookEvent')) || [];
+        if(isSaved){
+            toast.promise(
+                waitPromise,{
+                    pending: "UnSaving Event...",
+                    success: "UnSave Event Successful",
+                    error: "UnSave Event Failed",
+                },
+                {position: "top-right", autoClose: 900}
+            )
+        }else{
+            toast.promise(
+                waitPromise,{
+                    pending: "Saving Event...",
+                    success: "Save Event Successful",
+                    error: "Save Event Failed",
+                },
+                {position: "top-right", autoClose: 900}
+            )
+        }
 
-        const alreadyBook = currentBookmark.some(ev => String(ev.id) === String(id) && ev.email === dataSesi.email);
-
-        let updateBookEvent;
-
-        //bisa kita coba ternary hehe
-        updateBookEvent = alreadyBook ? currentBookmark.filter(ev => String(ev.id) !== String(id)) : [...currentBookmark, newBookmark]
-
-        localStorage.setItem('bookEvent', JSON.stringify(updateBookEvent));
-        setBookmark(updateBookEvent);
+        try{
+            await waitPromise;
+            dispatch(fetchSavedEvents());
+        }catch(error){
+            console.error("Error saving event:", error);
+        }
     }
     
     const sisaSlot = slot - participant
@@ -102,7 +144,7 @@ function EventDiscover({id, type, title, date, hour, at, participant, slot, pict
                 <div className="relative">
                     <img src={pict} alt={title} className="w-full h-50 object-cover rounded-tl-xl rounded-tr-xl"/>
                     <div className="flex absolute left-2 bottom-2 gap-2">
-                        {type.map(val => <span key={val} className="px-3 py-1 text-xs text-amber-500 bg-white/10 border border-gray-400 rounded-full">{val}</span>)}
+                       <span  className="px-3 py-1 text-xs text-amber-500 bg-white/10 border border-gray-400 rounded-full">{type}</span>
                     </div>
                 </div>
             </Link>
@@ -131,21 +173,24 @@ function EventDiscover({id, type, title, date, hour, at, participant, slot, pict
                 </div>
                 <div className="w-full flex gap-2">
                     {isJoined ?   
-                            (<span className="w-full h-8 text-xs flex justify-center items-center gap-1 bg-green-700 rounded-lg text-gray-100 font-medium cursor-pointer"
+                            (<button className="w-full h-8 text-xs flex justify-center items-center gap-1 bg-green-700 rounded-lg text-gray-100 font-medium cursor-pointer"
                                 onClick={handleJoin}
-                            > <IoCheckmark/>Registered</span>)
+                                disabled={role === "organizer" || role === "admin"}
+                            > <IoCheckmark/>Registered</button>)
                         : 
-                        (<span className="w-full h-8 text-xs flex justify-center items-center bg-orange-600 rounded-lg text-gray-100 font-medium cursor-pointer"
+                        (<button className={`w-full h-8 text-xs flex justify-center items-center ${role === "organizer" || role === "admin" ? "bg-orange-300 text-gray-200" : "bg-orange-600"} rounded-lg text-gray-100 font-medium cursor-pointer`}
                             onClick={handleJoin}
-                        >Join Event</span>)
+                            disabled={role === "organizer" || role === "admin"}
+                        >Join Event</button>)
                     }
                     
-                    <div className={`w-9 flex justify-center items-center border  ${isBook ? "text-orange-500 border-orange-300" : `text-gray-400 ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`} rounded-md cursor-pointer`}
-                        onClick={handleBookmark}                    
+                    <button className={`w-9 flex justify-center items-center border  ${user?.saved_events_id?.includes(id) ? "text-orange-500 border-orange-300" : `text-gray-400 ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`} rounded-md cursor-pointer`}
+                        onClick={handleBookmark}  
+                        disabled={role === "organizer" || role === "admin"}                  
                     >
-                        {isBook ? <IoBookmark /> : <IoBookmarkOutline/>}
+                        {isSaved ? <IoBookmark /> : <IoBookmarkOutline/>}
                         
-                    </div>
+                    </button>
                 </div>
             </div>
       </article>

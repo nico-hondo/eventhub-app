@@ -3,24 +3,22 @@ import { IoLocationOutline } from "react-icons/io5";
 import { IoTimeOutline } from "react-icons/io5";
 import { IoPeopleOutline } from "react-icons/io5";
 import { IoBookmarkOutline } from "react-icons/io5";
-import { convertDate } from "../../../components/utils/utilitas";
+import { convertDate, convertHour } from "../../../components/utils/utilitas";
 import { IoShareSocialOutline } from "react-icons/io5";
 
 function DetailContent({data}) {
-    const percentage = (data.attendees_count / data.capacity) * 100;
+    const percentage = Math.round((data.total_participants / data.max_participants) * 100);
 
-    const sisaSlot = data.capacity - data.attendees_count
+    const sisaSlot = data.max_participants - data.total_participants
   return (
     <section className="w-full flex justify-center items-center py-8">
         <div className="max-w-5xl flex-1 flex gap-8">
             <div className="flex-3 flex flex-col gap-6">
                 <img src={data.image_url} alt={data.title} className="w-150 h-60 object-cover rounded-2xl"/>
                 <div className="flex gap-2">
-                    {data.tags.map((val) => {
-                        return(
-                            <span key={val} className="text-[12px] text-blue-700 rounded-full bg-blue-600/20 px-3 py-0.5">{val}</span>
-                        )
-                    })}    
+                    
+                    <span className="text-[12px] text-blue-700 rounded-full bg-blue-600/20 px-3 py-0.5">{data.category}</span>
+                          
                 </div>
                 <h2 className="text-3xl text-gray-800 font-medium">{data.title}</h2>
 
@@ -50,8 +48,8 @@ function DetailContent({data}) {
                 <div className="flex flex-col gap-3 p-4 border border-gray-200 bg-white rounded-lg">
                     <div className="flex flex-col gap-2 border-b border-gray-200 py-2">
                         <span className="uppercase text-gray-400 text-xs font-medium mb-1">event info</span>
-                        <div className="flex gap-2 items-center text-xs text-gray-800 font-medium"><CiCalendar/>{convertDate(data.date)}</div>
-                        <div className="flex gap-2 items-center text-xs text-gray-800 font-medium"><IoTimeOutline/>{data.start_time} - {data.end_time}</div>
+                        <div className="flex gap-2 items-center text-xs text-gray-800 font-medium"><CiCalendar/>{convertDate(data.start_time)}</div>
+                        <div className="flex gap-2 items-center text-xs text-gray-800 font-medium"><IoTimeOutline/>{convertHour(data.start_time)} - {convertHour(data.end_time)}</div>
                         <div className="flex gap-2 items-center text-xs text-gray-800 font-medium"><IoLocationOutline/>{data.location}</div>
                     </div>
 
@@ -62,8 +60,8 @@ function DetailContent({data}) {
                         </div>
                         <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center">
-                                <span className="text-xs">{data.attendees_count} attendees</span>
-                                <span className="text-xs">{data.capacity} capacity</span>
+                                <span className="text-xs">{data.total_participants} attendees</span>
+                                <span className="text-xs">{data.max_participants} capacity</span>
                             </div>
                             <div className={`w-full relative h-2 rounded-full bg-gray-200 before:content-[''] before:absolute before:w-(--progress) before:h-2 ${sisaSlot === 0 ? "before:bg-red-600" : percentage <= 50 ? "before:bg-green-600" : "before:bg-yellow-500"} before:rounded-full`} style={{ "--progress": `${percentage}%` }}></div>
                         </div>

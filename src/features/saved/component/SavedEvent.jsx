@@ -1,33 +1,29 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { IoBookmark } from "react-icons/io5";
 import { Link } from "react-router";
 
-// import events from '../../../data/events.json';
+import events from '../../../data/events.json';
 import EventDiscover from '../../../components/event/EventDiscover';
 import { convertDate } from '../../../components/utils/utilitas';
+import { useSelector } from "react-redux";
+import { selectSession, selectUser } from "../../auth/store/authSelectors";
 
 function SavedEvent() {
-  const [userBookmark, setUserBookmark] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    const session = localStorage.getItem('session');
-    if(!session){
-      // setCurrentUser(null);
-      return
+  const session = useSelector(selectSession);
+    const users = useSelector(selectUser);
+  
+    const user = users.filter((val) => val.email === session?.email);
+  
+    // guard: session/user belum siap (misal persist belum rehydrate) -> jangan lanjut proses
+    if (!session?.email || user.length === 0) {
+      return null; // atau tampilin loading skeleton
     }
-    const dataSesi = JSON.parse(session);
-    setCurrentUser(dataSesi);
-
-    const currentBookEvent = JSON.parse(localStorage.getItem('bookEvent')) || [];
-
-    const bookEvent = currentBookEvent.filter(ev => ev.email === dataSesi.email);
-
-    setUserBookmark(bookEvent);
-  }, [])
+    
+    const savedEventIds = user[0]?.saved_events_id ?? [];
+    const savedData = events.filter((val) => savedEventIds.includes(val.id));
   
   // Kalau belum login
-    if (!currentUser) {
+    if (!session) {
         return (
             <div className="text-center py-10">
                 <p className="text-gray-500">Please login to see your saved events</p>
@@ -39,7 +35,7 @@ function SavedEvent() {
   return (
     <>
 
-      {userBookmark.length === 0 ?
+      {savedData.length === 0 ?
           (<section className="w-full min-h-100 flex justify-center items-center py-6">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <IoBookmark className="text-gray-900 text-4xl"/>
@@ -54,7 +50,7 @@ function SavedEvent() {
          (
           <div className="grid grid-rows-2 grid-cols-3 gap-5">
 
-          {userBookmark.map((val) => {
+          {savedData.map((val) => {
             return(
               <EventDiscover 
                 key={`${val.id}-${val.email}`}
@@ -62,11 +58,11 @@ function SavedEvent() {
                 type={val.tags}
                 title={val.title}
                 date={convertDate(val.date)}
-                hour={val.hour}
-                at={val.at}
-                participant={val.participant}
-                slot={val.slot}
-                pict={val.pict}
+                hour={val.start_time}
+                at={val.location}
+                participant={val.attendees_count}
+                slot={val.capacity}
+                pict={val.image_url}
               
               />
             )

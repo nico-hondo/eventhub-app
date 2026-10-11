@@ -1,7 +1,23 @@
+import { useEffect, useState } from "react";
 import EventCommunities from "../../../components/communities/EventCommunities";
-import community from "../../../data/communities.json";
+import fetchUrl from "../../../components/utils/fetchUrl";
 
 function Popular({theme}) {
+    const [communities, setCommunity] = useState([])
+
+    useEffect(() => {
+        (async () => {
+            try{
+                const url = "http://localhost:8000/community/popular";
+                const result = await fetchUrl(url);
+                setCommunity(result?.Data || []);
+            }catch (err) {
+                console.log(err)
+            }
+        })();
+    }, []);
+
+    console.log(communities)
   return (
     <section className="w-full flex justify-center items-center py-4">
         <div className="max-w-6xl flex-1 flex flex-col gap-5">
@@ -10,17 +26,17 @@ function Popular({theme}) {
                 <span className="text-xs text-gray-400">See all &#8594;</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {community.slice(0,4).map((val) => {
+                {communities.map((val) => {
                     return(
                         <EventCommunities
                             key={val.id}
                             id={val.id}
                             title={val.name}
                             desc={val.description}
-                            type={val.tags}
-                            member={val.member_count}
-                            agenda={val.upcoming_events_count}
-                            pict={val.banner_url}
+                            type={val.category}
+                            member={val.total_members}
+                            agenda={val.total_upcoming_events}
+                            pict={val.image_url}
                         />
                     )
                 })}

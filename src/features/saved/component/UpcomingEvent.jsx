@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+// import { useState, useMemo } from "react";
 import { IoBookmark } from "react-icons/io5";
 import { Link } from "react-router";
 
@@ -6,38 +6,18 @@ import { Link } from "react-router";
 import EventDiscover from '../../../components/event/EventDiscover';
 import events from '../../../data/events.json';
 import { convertDate } from '../../../components/utils/utilitas';
+import { useSelector } from "react-redux";
+import { selectSession, selectUser } from "../../auth/store/authSelectors";
 
 function UpcomingEvent() {
 
-  const session = localStorage.getItem('session');
-  const dataSesi = JSON.parse(session);
-
-  const [dataEvent] = useState(() => {
-    const joinEvent = localStorage.getItem('joinEvent');
-    return joinEvent? JSON.parse(joinEvent) : [];
-  })
-
-  // 1. Ambil id event milik user yg login doang
-  const userJoinedIds = useMemo(() => {
-    return dataEvent
-     .filter(ev => String(ev.email) === String(dataSesi.email)) // filter punya user ini
-     .map(ev => String(ev.id)) // ambil id nya aja
-  }, [dataEvent, dataSesi.email])
-
-  // 2. Join ke data store events.json
-  const userJoinEvent = useMemo(() => {
-    return events.filter(event => userJoinedIds.includes(String(event.id)))
-  }, [userJoinedIds])
-
-  console.log("ID yg dijoin:", userJoinedIds);
-  console.log("Data lengkap:", userJoinEvent);
-
-  if(!session){
-    return
-  }
+  const session = useSelector(selectSession);
+  const users = useSelector(selectUser);
+  
+  const user = users.filter((val) => val.email === session?.email);
   
   // Kalau belum login
-    if (!dataSesi) {
+    if (!session) {
         return (
             <div className="text-center py-10">
                 <p className="text-gray-500">Please login to see your saved events</p>
@@ -46,10 +26,13 @@ function UpcomingEvent() {
         )
     }
 
+    const joinedCommunityIds = user[0]?.events_id ?? [];
+    const joinedData = events.filter((val) => joinedCommunityIds.includes(val.id));
+
   return (
     <>
 
-      {userJoinEvent.length === 0 ?
+      {joinedData.length === 0 ?
           (<section className="w-full min-h-100 flex justify-center items-center py-6">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <IoBookmark className="text-gray-900 text-4xl"/>
@@ -63,8 +46,8 @@ function UpcomingEvent() {
          (
           <>
             <div className="flex flex-col gap-4">
-              <div className="grid grid-rows-2 grid-cols-3 gap-5">
-                {userJoinEvent.map((val) => {
+              <div className="grid grid-cols-3 gap-5">
+                {joinedData.map((val) => {
                   return(
                     <EventDiscover 
                       key={`${val.id}-${val.email}`}

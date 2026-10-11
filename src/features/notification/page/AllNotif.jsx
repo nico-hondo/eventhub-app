@@ -1,5 +1,4 @@
-import { useContext } from 'react';
-import notification from '../../../data/notification.json';
+import { useContext, useEffect } from 'react';
 
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { TiBell } from "react-icons/ti";
@@ -8,13 +7,15 @@ import { GrSend } from "react-icons/gr";
 import { IoChatboxOutline } from "react-icons/io5";
 
 import themeContext from '../../../context/theme/themeContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotification } from '../../../redux/slices/notifSlice';
 
 // helper: tentukan icon & warna bg berdasarkan adds-on
 function getNotifIcon(type) {
     switch (type) {
         case 'reminder':
             return { icon: <IoCalendarClearOutline className="text-orange-600 font-medium" />, bg: 'bg-amber-300/30' };
-        case 'welcome':
+        case 'Registrasi':
             return { icon: <TiBell className="text-green-600 font-medium" />, bg: 'bg-green-300/30' };
         case 'group':
             return { icon: <FiUsers className="text-blue-600 font-medium" />, bg: 'bg-blue-300/30' };
@@ -23,15 +24,26 @@ function getNotifIcon(type) {
         default:
             return { icon: <IoChatboxOutline className="text-violet-600 font-medium" />, bg: 'bg-violet-300/30' };
     }
+
 }
 
 function AllNotif() {
 
     const {theme} = useContext(themeContext);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchNotification());
+    }, [dispatch])
+
+    const {notif} = useSelector((state) => state.notification);
+
+    console.log(notif);
     return (
         <div className={`max-w-4xl max-h-100 flex-1 flex flex-col overflow-y-auto whitespace-nowrap border  shadow-md rounded-lg gap-2.5 ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-black border-gray-700'}`}>
-            {notification.map((val, index) => {
-                const { icon, bg } = getNotifIcon(val['adds-on']);
+            {notif.map((val, index) => {
+                const { icon, bg } = getNotifIcon(val.name);
 
                 return (
                     <article key={index} className={`flex justify-between items-center px-8 py-4 cursor-pointer border-b ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'}`}>
@@ -43,7 +55,7 @@ function AllNotif() {
                                 <h3 className={`text-md ${theme === 'light' ? 'text-gray-900' : 'text-gray-200'} ${val.status === "unread" ? 'font-medium' : 'font-normal'}`}>
                                     {val.title}
                                 </h3>
-                                <p className="text-xs text-gray-500">{val.desc}</p>
+                                <p className="text-xs text-gray-500">{val.message}</p>
                             </div>
                         </div>
                         <div className="flex justify-center items-center gap-2">

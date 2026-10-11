@@ -3,15 +3,20 @@ import { NavLink } from "react-router"
 import { FiMoon } from "react-icons/fi";
 import { IoSunnyOutline } from "react-icons/io5";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { FaBars } from "react-icons/fa6";
 import ModalIcon from "../../../features/auth/components/ModalIcon";
 import themeContext from "../../../context/theme/themeContext";
 
 function Attendee({session, onLogout}) {
     const [show, setShow] = useState(false);
     const triggerRef = useRef(null);
-    const firstLetter = session.nama.split(' ').map(val => val[0]).join("");
+
+    const userName = session?.name || session?.nama || "";
+
+    const firstLetter = userName ? userName.split(' ').map(val => val[0]).join("") : "G";
 
     const {theme, toogleTheme} = useContext(themeContext);
+
   return (
     <>
         <header className={`w-full sticky top-0 z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
@@ -21,7 +26,7 @@ function Attendee({session, onLogout}) {
                         <span className="rounded-lg text-center font-medium text-md px-2.5 py-0.5 text-gray-200 bg-orange-500">E</span>
                         <h1 className={`text-lg ${theme==='light' ? 'text-gray-800' : 'text-gray-200'} font-medium`}>EventHub</h1>
                     </div>
-                    <nav>
+                    <nav className="hidden lg:flex">
                         <ul className="flex gap-4">
                             <li className=""><NavLink to="/" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Explore</NavLink></li>
                             <li><NavLink to="/events" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Events</NavLink></li>
@@ -53,9 +58,10 @@ function Attendee({session, onLogout}) {
                             return setShow(true)
                         }
                         return setShow(false)
-                    }} className="w-7 h-7 flex justify-center items-center text-xs font-medium text-gray-100 text-center bg-orange-600 rounded-full cursor-pointer">
+                    }} className="w-7 h-7 hidden lg:flex justify-center items-center text-xs font-medium text-gray-100 text-center bg-orange-600 rounded-full cursor-pointer">
                         <span>{firstLetter}</span>
                     </div>
+                    <FaBars className="flex lg:hidden font-semibold"/>
                 </div>
                 { show && <ModalIcon session={session} onClose={() => setShow(false)} onLogout={onLogout} excludeRef={triggerRef}/>}
             </div>

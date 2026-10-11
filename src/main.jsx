@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from "react-router"
 import './index.css'
 import Router from './Router.jsx';
+import {ToastContainer} from 'react-toastify';
 import ThemeProvider from './context/theme/ThemeProvider.jsx';
 import reduxStore, {persistor} from './redux/store';
 import { Provider } from 'react-redux';
@@ -14,7 +15,10 @@ createRoot(document.getElementById('root')).render(
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
           <BrowserRouter>
-              <Router/>
+            <Router/>
+            <ToastContainer
+              toastStyle={{ fontSize: "13px"}}
+            />
           </BrowserRouter>
         </ThemeProvider>
       </PersistGate>

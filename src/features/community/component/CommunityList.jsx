@@ -1,10 +1,25 @@
-import communities from '../../../data/communities.json';
+import { useDispatch, useSelector } from 'react-redux';
 import EventCommunities from '../../../components/communities/EventCommunities';
+import { useEffect} from 'react';
+import { fetchCommunity } from '../../../redux/slices/communitySlice';
 
 function CommunityList({theme}) {
     const filter = ['All Categories', 'Technology', 'Design', 'Business', 'Career', 'AI', 'Programming', 'Music'];
 
-    const lengthListCommunity = communities.length;
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchCommunity())
+    }, [dispatch]);
+
+    const {community, isLoading, error} = useSelector((state) => state.community)
+
+    const lengthListCommunity = community.length;
+
+    console.log("community", community)
+    if(isLoading) return <div className="text-center mt-10">Loading...</div>
+
+    if(error) return <div className="text-red-500 text-center mt-10">{error}</div>
   return (
         <section className="w-full flex justify-center items-center">
             <div className="max-w-6xl flex-1 flex flex-col gap-10 py-6">
@@ -28,17 +43,17 @@ function CommunityList({theme}) {
                 <div className="flex flex-col gap-4">
                     <p className="text-sm text-gray-400"><span className="text-gray-700 font-medium">{lengthListCommunity}</span> events found</p>
                         <div className="grid grid-rows-2 grid-cols-4 gap-5">
-                            {communities.map((val) => {
+                            {community.map((val) => {
                                 return(
                                     <EventCommunities
                                         key={val.id}
                                         id={val.id}
                                         title={val.name}
                                         desc={val.description}
-                                        type={val.tags}
-                                        member={val.member_count}
-                                        agenda={val.upcoming_events_count}
-                                        pict={val.banner_url}
+                                        type={val.category}
+                                        member={val.total_members}
+                                        agenda={val.total_upcoming_events}
+                                        pict={val.image_url}
                                     />
                                 )
                             })}

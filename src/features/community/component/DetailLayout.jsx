@@ -3,14 +3,14 @@ import { NavLink, Outlet } from "react-router"
 function DetailLayout({data}) {
     return (
         <section className="w-full flex flex-col justify-center items-center">
-            <div className="w-full relative">
-                <img src={data.banner_url} alt={data.name} className="w-full h-100 object-cover"/>
+            <div className="w-full relative before:content-[''] before:absolute before:inset-0 before:bg-black/60">
+                <img src={data.image_url} alt={data.name} className="w-full h-100 object-cover"/>
                 <div className="w-full flex justify-between items-center absolute bottom-10 px-20">
                     <div className="flex-1 flex flex-col gap-1">
                         <h2 className="text-3xl text-gray-100 font-medium">{data.name}</h2>
                         <div className="flex gap-4 text-xs text-gray-300">
-                            <p>{data.member_count} members</p>
-                            <p>{data.upcoming_events_count} upcoming events</p>
+                            <p>{data.total_members} members</p>
+                            <p>{data.total_upcoming_events} upcoming events</p>
                         </div>
                     </div>
                     <div className="">
@@ -23,13 +23,9 @@ function DetailLayout({data}) {
                     <div className="w-full flex flex-col gap-2">
                         <p className="text-xs text-gray-400">{data.description}</p>
                         <div className="flex gap-3">
-                            {data.tags.map((val) => {
-                                return(
-                                    <span key={val} className="px-3 py-0.5 bg-orange-600 rounded-full text-xs text-white">
-                                        {val}
-                                    </span>
-                                )
-                            })}
+                            <span className="px-3 py-0.5 bg-orange-600 rounded-full text-xs text-white">
+                                {data.category}
+                            </span>
                         </div>
                     </div>
                 </div>

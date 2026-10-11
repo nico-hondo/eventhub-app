@@ -5,3 +5,10 @@ export function convertDate(date){
     year: 'numeric',
   });
 }
+
+export function convertHour(date){
+  return new Date(date).toLocaleString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}

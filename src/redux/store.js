@@ -4,6 +4,11 @@ import persistReducer from "redux-persist/es/persistReducer";
 
 import authReducer from './slices/authSlice';
 import registReducer from './slices/registerSlice';
+import forgotPasswordReducer from './slices/forgotPassSlice';
+import eventReducer from './slices/eventSlice';
+import communityReducer from './slices/communitySlice';
+import testimonyReducer from './slices/testiSlice';
+import notifReducer from './slices/notifSlice';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
 const storage = {
@@ -21,19 +26,24 @@ const storage = {
 const persistAuthConfig = {
     key: 'session',
     storage,
-    whitelist: ['user'],
+    whitelist: ['token', 'user', 'isAuthenticated'], //simpan field ini secara otomatis
 };
 
 const persistRegistConfig = {
     key: 'users',
     storage,
-    whitelist: ['registeredUser'],
+    // whitelist: ['registeredUser'],
 }
 
 const store = configureStore({
     reducer: {
         activeState: persistReducer(persistAuthConfig, authReducer),
         registState: persistReducer(persistRegistConfig, registReducer),
+        forgotPasswordState: forgotPasswordReducer,
+        events: eventReducer,
+        community: communityReducer,
+        testimony: testimonyReducer,
+        notification: notifReducer,
     },
      middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

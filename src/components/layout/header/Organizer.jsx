@@ -27,7 +27,6 @@ function Organizer({session, onLogout}) {
                             <li className=""><NavLink to="/" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Explore</NavLink></li>
                             <li><NavLink to="/events" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Events</NavLink></li>
                             <li><NavLink to="/communities" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>Communities</NavLink></li>
-                            <li><NavLink to="/my-events" className={({isActive}) => isActive ? "text-xs font-medium text-orange-500 bg-orange-300/30 px-3 py-1.5 rounded-lg" : `text-xs font-medium ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>My Events</NavLink></li>
                         </ul>
                     </nav>
                 </div>

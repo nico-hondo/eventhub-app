@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router";
-
+import { toast } from "react-toastify";
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
+import { FaCircleNotch } from "react-icons/fa";
+import { IoIosEye } from "react-icons/io";
+import { IoIosEyeOff } from "react-icons/io";
 import AuthSidePanel from "../components/AuthSidePanel";
 import { Link } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { registerThunk } from "../../../redux/slices/registerSlice";
 
 function SignUp() {
-    const {register, handleSubmit, setError, formState: { errors }} = useForm();
+    const {register, handleSubmit, setError, formState: { errors, isSubmitting }} = useForm();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfPassword, setShowConfPassword] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -42,17 +48,24 @@ function SignUp() {
             name,
             email,
             password,
-            role: 'attendee',
-            img: 'D:/Lamaran Kerja/KODA/Week05/koda-b9-eventhub/public/img/img-profile.jpg',
-            community_id: [],
-            events_id: [],
         }
 
+        const waitPromise = dispatch(registerThunk(newUser));
+
+        toast.promise(
+            waitPromise,{
+                pending: "Signing up...",
+                success: "Registration Successful",
+                error: "Registration Failed",
+            },
+            {position: "top-right", autoClose: 800}
+        )
+
         try{
-            await dispatch(registerThunk(newUser)).unwrap();
+            await waitPromise;
             navigate('/auth')
         }catch(err){
-            setError('email', {message: err ? err : 'Registrasi Gagal, coba lagi'});
+            setError('email', {message: err ? err : 'Registration Failed, please try again'});
         }
         
     }
@@ -71,12 +84,18 @@ function SignUp() {
 
     return (
         <div className="w-full h-screen flex flex-row">
-            <AuthSidePanel/>
+            <div className="hidden lg:flex lg:flex-1">
+                <AuthSidePanel/>
+            </div>
             <main className="w-full h-full flex-2 flex justify-center items-center">
                 <div className="max-w-5xl grid gap-4">
+                    <div className="flex lg:hidden gap-2 mb-5">
+                        <span className="rounded-lg text-center font-medium text-md px-2.5 py-0.5 text-gray-100 bg-orange-500">E</span>
+                        <h1 className="text-xl font-semibold text-gray-800">EventHub</h1>
+                    </div>
                     <div className="grid gap-2">
                         <h3 className="font-medium text-2xl text-bold text-black">
-                           "Create Your Account"
+                           Create Your Account
                         </h3>
                         <p className="text-gray-500 text-xs">
                             Already have an account?{" "}
@@ -129,30 +148,50 @@ function SignUp() {
                         <div className="grid gap-2">
                             <label htmlFor="pass" className="text-sm font-medium text-gray-500">Password</label>
                             <div>
-                                <input type="password" name="password" id="pass" placeholder="At least 8 characters" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.password ? "border-red-500" : "border-gray-300"}`}
-                                {...register('password', {
-                                    required: 'Password is required',
-                                    minLength: {
-                                        value: 6,
-                                        message: 'Password must be a minimal 6 characters',
-                                    },
-                                })}
-                                />
+                                <div className="w-full relative flex justify-between">
+                                    <input 
+                                        type={showPassword ? "text" : "password"} 
+                                        name="password" 
+                                        id="pass" 
+                                        placeholder="At least 8 characters" 
+                                        className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.password ? "border-red-500" : "border-gray-300"}`}
+                                        {...register('password', {
+                                            required: 'New Password is required',
+                                            minLength: {
+                                                value: 6,
+                                                message: 'Password must be a minimal 6 characters',
+                                            },
+                                        })}
+                                    />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-2.5 text-gray-400 cursor-pointer focus:outline-none">
+                                        {showPassword ? <IoIosEyeOff /> : <IoIosEye />}
+                                    </button>
+                                </div>
                                 {errors.password && (<p className="text-red-500 text-[11px]">{errors.password.message}</p>)}
                             </div>
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="confpass" className="text-sm font-medium text-gray-500">Confirm Password</label>
                             <div>
-                                <input type="password" name="confpass" id="confpass" placeholder="Re-enter your password" className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.confPass ? "border-red-500" : "border-gray-300"}`}
-                                {...register('confPass', {
-                                    required: '',
-                                    minLength: {
-                                        value: 6,
-                                        message: 'Password must be a minimal 6 characters',
-                                    }
-                                })}
-                                />
+                                <div className="w-full relative flex justify-between">
+                                    <input 
+                                        type={showConfPassword ? "text" : "password"} 
+                                        name="confpass" 
+                                        id="confpass" 
+                                        placeholder="Re-enter your password" 
+                                        className={`w-90 border p-2.5 rounded-lg text-xs text-gray-700 focus:outline-none ${errors.confPass ? "border-red-500" : "border-gray-300"}`}
+                                        {...register('confPass', {
+                                            required: 'Please confirm your password',
+                                            minLength: {
+                                                value: 6,
+                                                message: 'Password must be a minimal 6 characters',
+                                            }
+                                        })}
+                                    />
+                                    <button type="button" onClick={() => setShowConfPassword(!showConfPassword)} className="absolute right-4 top-2.5 text-gray-400 cursor-pointer focus:outline-none">
+                                        {showConfPassword ? <IoIosEyeOff /> : <IoIosEye />}
+                                    </button>
+                                </div>
                                 {errors.confPass && (<p className="text-red-500 text-[11px]">{errors.confPass.message}</p>)}
                             </div>
                         </div>
@@ -191,8 +230,11 @@ function SignUp() {
                             </label>
                         </div>
                         {errors.accTerms && (<p className="text-red-500 text-[11px]">{errors.accTerms.message}</p>)}
-                        <button type="submit" className="w-full p-2.5 bg-orange-600 text-sm font-medium text-white rounded-lg cursor-pointer">
-                            {isLoading ? 'loading' : "Create Account"}
+                        <button 
+                            type="submit"
+                            disabled={isSubmitting} 
+                            className="w-full p-2.5 bg-orange-600 text-sm font-medium text-white rounded-lg cursor-pointer">
+                                {isLoading ? <FaCircleNotch className="animate-spin mx-auto" /> : "Create Account"}
                         </button>
                     </form>
                 </div>
