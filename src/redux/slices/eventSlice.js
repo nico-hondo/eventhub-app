@@ -110,7 +110,7 @@ export const fetchSavedEvents = createAsyncThunk(
                 localStorage.clear();
                 return rejectWithValue("token tidak ada, silahkan login ulang")
             }
-            const url = "${BASE_URL}/events/saved-events";
+            const url = `${BASE_URL}/events/saved-events`;
             const [response] = await Promise.all([
                 fetchUrl(url, {
                     method: "GET",
