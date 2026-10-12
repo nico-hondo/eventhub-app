@@ -9,6 +9,8 @@ const initialState = {
     error: null,
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const fetchNotification = createAsyncThunk(
     "notifications",
     async(_, {getState, rejectWithValue}) => {
@@ -18,7 +20,7 @@ export const fetchNotification = createAsyncThunk(
                 localStorage.clear();
                 return rejectWithValue("token tidak ada, silahkan login ulang")
             }
-            const url = "http://localhost:8000/my-notification";
+            const url = `${BASE_URL}/my-notification`;
             const [response] = await Promise.all([
                 fetchUrl(url, {
                     method: "GET",

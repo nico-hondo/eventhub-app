@@ -9,11 +9,13 @@ const initialState = {
     error: null,
 };
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const registerThunk = createAsyncThunk(
     "register",
     async (newUser, {rejectWithValue}) => {
         try{
-            const url = "http://localhost:8000/auth/register";
+            const url = `${BASE_URL}/auth/register`;
             const result = await Promise.all([ 
                 fetchUrl(url, {
                     method: "POST",
@@ -59,7 +61,7 @@ export const joinEventThunk = createAsyncThunk(
                 return rejectWithValue("Token tidak ada, silakan login ulang");
             }
 
-            const url = `http://localhost:8000/events/${eventId}/join`;
+            const url = `${BASE_URL}/events/${eventId}/join`;
             const [response] = await Promise.all([
                 fetchUrl(url, {
                     method: "POST",

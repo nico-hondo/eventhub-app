@@ -12,6 +12,8 @@ const initialState = {
     error: null,
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const fetchEvents = createAsyncThunk(
     "events",
     async(params={}, {rejectWithValue}) => {
@@ -25,7 +27,7 @@ export const fetchEvents = createAsyncThunk(
             if (category) query.append("category", category);
 
             // Jika semua kosong, maka URL hanya sampai event, tidak menggunakan params sama sekali.
-            const url = `http://localhost:8000/events${query.toString() ? `?${query.toString()}` : ""}`; 
+            const url = `${BASE_URL}/events${query.toString() ? `?${query.toString()}` : ""}`; 
             
             const result = await fetchUrl(url);
             return result?.Data || [];
@@ -40,7 +42,7 @@ export const fetchEventById = createAsyncThunk(
     "eventById",
     async(id, {rejectWithValue}) => {
         try{
-            const url = `http://localhost:8000/events/${id}`;
+            const url = `${BASE_URL}/events/${id}`;
             const result = await fetchUrl(url);
             return result?.Data || [];
         }catch(err){
@@ -58,7 +60,7 @@ export const fetchMyEvents = createAsyncThunk(
                 localStorage.clear();
                 return rejectWithValue("token tidak ada, silahkan login ulang")
             }
-            const url = "http://localhost:8000/events/myevents";
+            const url = `${BASE_URL}/events/myevents`;
             const [response] = await Promise.all([
                 fetchUrl(url, {
                     method: "GET",
@@ -81,7 +83,7 @@ export const saveEventThunk = createAsyncThunk(
     async ({ eventId }, { getState, rejectWithValue }) => {
         try {
             const token = getState().activeState.token;
-            const url = `http://localhost:8000/events/${eventId}/save`;
+            const url = `${BASE_URL}/events/${eventId}/save`;
 
             const [response] = await Promise.all([
                 fetchUrl(url, {
@@ -108,7 +110,7 @@ export const fetchSavedEvents = createAsyncThunk(
                 localStorage.clear();
                 return rejectWithValue("token tidak ada, silahkan login ulang")
             }
-            const url = "http://localhost:8000/events/saved-events";
+            const url = "${BASE_URL}/events/saved-events";
             const [response] = await Promise.all([
                 fetchUrl(url, {
                     method: "GET",

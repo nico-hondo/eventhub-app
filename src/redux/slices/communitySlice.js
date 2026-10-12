@@ -11,11 +11,13 @@ const initialState = {
     error: null,
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const fetchCommunity = createAsyncThunk(
     "community",
     async(_, {rejectWithValue}) => {
         try{
-            const url = "http://localhost:8000/community";
+            const url = `${BASE_URL}/community`;
             const result = await fetchUrl(url);
             return result?.Data || [];
         }catch(err){
@@ -29,7 +31,7 @@ export const fetchCommunityById = createAsyncThunk(
     "communityById",
     async(id, {rejectWithValue}) => {
         try{
-            const url = `http://localhost:8000/community/${id}`;
+            const url = `${BASE_URL}/community/${id}`;
             const result = await fetchUrl(url);
             return result?.Data || [];
         }catch (err){

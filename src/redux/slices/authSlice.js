@@ -11,11 +11,13 @@ const initialState = {
     error: null,
 };
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const loginUser = createAsyncThunk(
     "login",
     async(user, { rejectWithValue}) => {
         try{
-            const url = "http://localhost:8000/auth/login";
+            const url = `${BASE_URL}/auth/login`;
             const result = await Promise.all([
                 fetchUrl(url, {
                     method: "POST",

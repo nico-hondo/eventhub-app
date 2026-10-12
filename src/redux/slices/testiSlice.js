@@ -6,11 +6,13 @@ const initialState = {
     error: null,
 }
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const fetchTestimony = createAsyncThunk(
     "testimony",
     async(_, {rejectWithValue}) => {
         try{
-            const url = "http://localhost:8000/testimony";
+            const url = `${BASE_URL}/testimony`;
             const result = await fetchUrl(url);
             return result?.Data || [];
         }catch(err){
