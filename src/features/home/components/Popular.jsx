@@ -5,10 +5,11 @@ import fetchUrl from "../../../components/utils/fetchUrl";
 function Popular({theme}) {
     const [communities, setCommunity] = useState([])
 
+    const BASE_URL = import.meta.env.VITE_API_URL || '/api';
     useEffect(() => {
         (async () => {
             try{
-                const url = "http://localhost:8000/community/popular";
+                const url = `${BASE_URL}/community/popular`;
                 const result = await fetchUrl(url);
                 setCommunity(result?.Data || []);
             }catch (err) {
