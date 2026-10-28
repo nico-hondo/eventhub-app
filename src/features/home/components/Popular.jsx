@@ -16,9 +16,9 @@ function Popular({theme}) {
                 console.log(err)
             }
         })();
-    }, []);
+    });
 
-    console.log(communities)
+    // console.log(communities)
   return (
     <section className="w-full flex justify-center items-center py-4">
         <div className="max-w-6xl flex-1 flex flex-col gap-5">

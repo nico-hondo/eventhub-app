@@ -12,7 +12,7 @@ const initialState = {
     error: null,
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const fetchEvents = createAsyncThunk(
     "events",
@@ -57,8 +57,7 @@ export const fetchMyEvents = createAsyncThunk(
         try{
             const token = getState().activeState.token;
             if (!token){
-                localStorage.clear();
-                return rejectWithValue("token tidak ada, silahkan login ulang")
+                return [];
             }
             const url = `${BASE_URL}/events/myevents`;
             const [response] = await Promise.all([
@@ -107,8 +106,7 @@ export const fetchSavedEvents = createAsyncThunk(
         try{
             const token = getState().activeState.token;
             if (!token){
-                localStorage.clear();
-                return rejectWithValue("token tidak ada, silahkan login ulang")
+                return [];
             }
             const url = `${BASE_URL}/events/saved-events`;
             const [response] = await Promise.all([
@@ -121,7 +119,7 @@ export const fetchSavedEvents = createAsyncThunk(
                 }),
                 new Promise((resolve) => setTimeout(resolve, 2000))
             ]);
-            console.log("fetch events saved:", response);
+            // console.log("fetch events saved:", response);
 
             return response?.Data || response || [];
         } catch(error){

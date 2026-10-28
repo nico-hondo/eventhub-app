@@ -1,33 +1,23 @@
-// import { useEffect, useState } from "react";
 import { IoBookmark } from "react-icons/io5";
-// import { Link } from "react-router";
 
-import events from '../../../data/events.json';
 import EventDiscover from '../../../components/event/EventDiscover';
-import { convertDate } from '../../../components/utils/utilitas';
+import { convertDate, convertHour } from '../../../components/utils/utilitas';
 import { useSelector } from "react-redux";
-import { selectSession, selectUser } from "../../auth/store/authSelectors";
+import { selectSession} from "../../auth/store/authSelectors";
 
 function ProfileSaved() {
+  const {saved_events} = useSelector((state) => state.events);
+  console.log(saved_events);
   const session = useSelector(selectSession);
-  const users = useSelector(selectUser);
-
-  const user = users.filter((val) => val.email === session?.email);
 
   // guard: session/user belum siap (misal persist belum rehydrate) -> jangan lanjut proses
-  if (!session?.email || user.length === 0) {
+  if (!session?.email) {
     return null; // atau tampilin loading skeleton
   }
-  
-  const savedEventIds = user[0]?.saved_events_id ?? [];
-  const savedData = events.filter((val) => savedEventIds.includes(val.id));
-
-  // console.log(savedEventIds, savedData);
 
   return (
     <>
-
-      {savedData.length === 0 ?
+      {saved_events.length === 0 ?
           (<section className="w-full min-h-100 flex justify-center items-center pt-2">
             <div className="max-w-3xl flex-1 flex flex-col justify-center items-center gap-6">
               <IoBookmark className="text-gray-900 text-4xl"/>
@@ -42,18 +32,18 @@ function ProfileSaved() {
          (
           <section className="grid grid-cols-3 gap-4">
 
-          {savedData.map((val) => {
+          {saved_events.map((val) => {
             return(
               <EventDiscover 
-                key={`${val.id}-${val.email}`}
-                id={val.id}
-                type={val.tags}
+                key={val.event_id}
+                id={val.event_id}
+                type={val.category}
                 title={val.title}
-                date={convertDate(val.date)}
-                hour={val.start_time}
+                date={convertDate(val.start_time)}
+                hour={convertHour(val.start_time)}
                 at={val.location}
-                participant={val.attendees_count}
-                slot={val.capacity}
+                participant={val.total_participants}
+                slot={val.max_participants}
                 pict={val.image_url}
               />
             )

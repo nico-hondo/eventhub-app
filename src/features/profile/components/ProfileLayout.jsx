@@ -4,11 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { MdOutlineLocationOn } from "react-icons/md";
 import { IoCalendarClearOutline } from "react-icons/io5";
+import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import { FiEdit2, FiX, FiCamera } from "react-icons/fi";
 
 import themeContext from "../../../context/theme/themeContext";
-import { selectSession, selectRole, selectUser } from "../../auth/store/authSelectors";
+import { selectSession, selectRole } from "../../auth/store/authSelectors";
 import { resetPasswordThunk, updateProfileThunk } from "../../../redux/slices/registerSlice";
+import { fetchProfileUser } from "../../../redux/slices/userSlice";
+import { convertDate } from "../../../components/utils/utilitas";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -22,35 +25,77 @@ function ProfileLayout() {
   const { theme } = useContext(themeContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalPassOpen, setIsModalPassOpen] = useState(false);
+
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfPass, setShowConfPass] = useState(false);
+
+  //lanjutkan besok membuat hook form
+  const {register, handleSubmit, setError, formState:}
+
   const dispatch = useDispatch();
 
   const session = useSelector(selectSession);
   const role = useSelector(selectRole);
-  const users = useSelector(selectUser);
 
-  const user = users.filter((val) => val.email === session?.email);
+  useEffect(() => {
+    dispatch(fetchProfileUser())
+  }, [dispatch])
 
-  // guard: session/persist belum siap
-  if (!session?.email || user.length === 0) {
-    return null; // atau loading skeleton
-  }
+  const { userProfile, isPending } = useSelector((state) => state.user);
 
-  const currentUser = user[0];
+  const {myEvents} = useSelector((state) => state.events)
+  const {saved_events} = useSelector((state) => state.events)
+
+  console.log(userProfile);
+  
   const fileInputRef = useRef(null);
 
   const [formChangePass, setFormChangePass] = useState({
-    email: user.email,
+    email: "",
     oldPass: "",
     newPass: "",
     confirmPass: ""
   });
 
+  const currentUser = userProfile;
+
   const [formData, setFormData] = useState({
-    nama: currentUser.name ?? "",
-    location: currentUser.location || "Bandung, Indonesia",
-    bio: currentUser.bio || "Lorem ipsum dolor sit amet...",
-    avatar: currentUser.avatar || null,
+    nama: "",
+    location: "Bandung, Indonesia",
+    bio: "Lorem ipsum dolor sit amet...",
+    avatar: null,
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        nama: currentUser.name || currentUser.nama || "",
+        location: currentUser.location || "Bandung, Indonesia",
+        bio: currentUser.bio || "Lorem ipsum dolor sit amet...",
+        avatar: currentUser.avatar_url || currentUser.avatar || null,
+      });
+
+      setFormChangePass((prev) => ({
+        ...prev,
+        email: currentUser.email || ""
+      }));
+    }
+  }, [currentUser]);
+
+  // guard: session/persist belum siap
+  if (!session?.email) {
+    return null; // atau loading skeleton
+  }
+
+  // Guard 2: Jika data userProfile masih diproses / null, tampilkan loading agar tidak crash
+  if (!currentUser || isPending) {
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center text-sm text-gray-500">
+        Loading profile...
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -114,7 +159,7 @@ function ProfileLayout() {
               <div className="flex gap-4">
                 <div className="w-20 h-20 rounded-xl overflow-hidden bg-orange-400">
                   <img
-                    src={currentUser.img || "/img/img-profile.jpg"}
+                    src={currentUser.avatar_url || "/img/img-profile.jpg"}
                     alt={currentUser.name}
                     className="w-full h-full object-cover"
                   />
@@ -133,11 +178,14 @@ function ProfileLayout() {
                     </span>
                     <span className="flex items-center gap-1 text-xs text-gray-400">
                       <IoCalendarClearOutline />
-                      Joined March 2025
+                      {convertDate(currentUser.created_at)}
                     </span>
                     <span className="px-4 py-0.5 text-orange-600 font-medium bg-orange-200 text-xs rounded-full capitalize">
                       {role}
                     </span>
+                  </div>
+                  <div className="flex items-start w-full text-xs text-gray-700 font-medium">
+                    {currentUser.bio}
                   </div>
                 </div>
               </div>
@@ -161,7 +209,7 @@ function ProfileLayout() {
 
             <div className={`flex justify-center items-center ${theme === "light" ? "text-gray-800" : "text-gray-300"}`}>
               <div className="flex-1 flex flex-col justify-center items-center">
-                <span className="text-xl font-bold">{currentUser.events_id?.length ?? 0}</span>
+                <span className="text-xl font-bold">{myEvents.length ?? 0}</span>
                 <span className="text-gray-500 text-[12px] font-medium">Events</span>
               </div>
               <div className={`flex-1 flex flex-col justify-center items-center border-l border-r ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
@@ -169,7 +217,7 @@ function ProfileLayout() {
                 <span className="text-gray-500 text-[12px] font-medium">Communities</span>
               </div>
               <div className="flex-1 flex flex-col justify-center items-center">
-                <span className="text-xl font-bold">{currentUser.saved_events_id?.length ?? 0}</span>
+                <span className="text-xl font-bold">{saved_events?.length ?? 0}</span>
                 <span className="text-gray-500 text-[12px] font-medium">Saved</span>
               </div>
             </div>
@@ -181,7 +229,7 @@ function ProfileLayout() {
             </div>
           </div>
         </section>
-        <section className="w-full flex justify-center items-center">
+        <section className="w-full flex justify-center items-center pb-6">
           <Outlet />
         </section>
       </main>
@@ -200,7 +248,7 @@ function ProfileLayout() {
               <div className="flex flex-col items-start gap-3">
                 <div className="relative group">
                   <img
-                    src={currentUser.img || "/img/img-profile.jpg"}
+                    src={currentUser.avatar_url || "/img/img-profile.jpg"}
                     alt={currentUser.name}
                     className="w-20 h-20 rounded-xl object-cover"
                   />
@@ -265,17 +313,32 @@ function ProfileLayout() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label className={`text-sm font-medium ${theme === "light" ? "text-gray-700" : "text-gray-300"}`}>Old Password</label>
-                <input type="password" name="oldPass" value={formChangePass.old} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                <div className="w-full relative flex justify-between">
+                  <input type={showOldPass ? "text" : "password"} name="oldPass" value={formChangePass.old} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                  <button type="button" onClick={() => setShowOldPass(!showOldPass)} className="absolute right-4 top-2.5 text-gray-400 cursor-pointer focus:outline-none">
+                      {showOldPass ? <IoIosEyeOff /> : <IoIosEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className={`text-sm font-medium ${theme === "light" ? "text-gray-700" : "text-gray-300"}`}>New Password</label>
-                <input type="password" name="newPass" value={formChangePass.new} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                <div className="w-full relative flex justify-between">
+                  <input type={showNewPass ? "text" : "password"} name="newPass" value={formChangePass.new} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                  <button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute right-4 top-2.5 text-gray-400 cursor-pointer focus:outline-none">
+                      {showNewPass ? <IoIosEyeOff /> : <IoIosEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className={`text-sm font-medium ${theme === "light" ? "text-gray-700" : "text-gray-300"}`}>Confirm Password</label>
-                <input type="password" name="confPass" value={formChangePass.confirm} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                <div className="w-full relative flex justify-between">
+                  <input type={showConfPass ? "text" : "password"} name="confPass" value={formChangePass.confirm} onChange={handleChangePass} className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${theme === "light" ? "border-gray-300 bg-white" : "border-gray-700 bg-gray-800 text-white"}`} />
+                  <button type="button" onClick={() => setShowConfPass(!showConfPass)} className="absolute right-4 top-2.5 text-gray-400 cursor-pointer focus:outline-none">
+                      {showConfPass ? <IoIosEyeOff /> : <IoIosEye />}
+                  </button>
+                </div>
               </div>
             </div>
 

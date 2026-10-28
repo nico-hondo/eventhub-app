@@ -9,7 +9,7 @@ const initialState = {
     error: null,
 };
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const registerThunk = createAsyncThunk(
     "register",

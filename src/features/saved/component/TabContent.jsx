@@ -1,14 +1,17 @@
 import { NavLink, Outlet } from "react-router"
 import { useSelector } from "react-redux"
-import { selectSession, selectUser } from "../../auth/store/authSelectors"
+// import { selectSession, selectUser } from "../../auth/store/authSelectors"
 
 function TabContent({theme}) {
 
-  const session = useSelector(selectSession);
-  const users = useSelector(selectUser);
+  // const session = useSelector(selectSession);
+  // const users = useSelector(selectUser);
 
-  const user = users.filter((val) => val.email === session.email);
-  // console.log(countBook)
+  // const user = users.filter((val) => val.email === session.email);
+
+  const {myEvents} = useSelector((state) => state.events) || [];
+  const {saved_events} = useSelector((state) => state.events) || [];
+
   return (
     <section className="w-full flex-1 flex flex-col gap-6 justify-center items-center sticky top-14 z-40">
       <div className={`w-full max-w-5xl border-b ${theme === 'light' ? 'border-gray-300' : 'border-gray-700'} flex-1 flex flex-col gap-4 pt-6`}>
@@ -16,13 +19,13 @@ function TabContent({theme}) {
         <div className="flex gap-3 text-xs text-gray-400">
           <NavLink end to="" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
-          }>Upcoming <span>{`(${user[0].events_id === 0 ? '0' : user[0].events_id.length})`}</span></NavLink>
+          }>Upcoming <span>{`(${myEvents.length === 0 ? '0' : myEvents.length})`}</span></NavLink>
           <NavLink end to="past-event" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
           }>Past <span>{`(0)`}</span></NavLink>
           <NavLink end to="saved-event" className={({ isActive }) =>
           `${isActive ? "text-orange-600 border-b border-orange-600 px-4 py-2 font-medium cursor-pointer" : "px-4 py-2 font-medium cursor-pointer"}`
-          }>Saved <span>{`(${user[0].saved_events_id === 0 ? '0' : user[0].events_id.length})`}</span></NavLink>
+          }>Saved <span>{`(${saved_events.length === 0 ? '0' : saved_events.length})`}</span></NavLink>
         </div>
       </div>
 

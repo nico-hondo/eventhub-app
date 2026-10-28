@@ -10,13 +10,8 @@ import themeContext from "../../../context/theme/themeContext";
 function Attendee({session, onLogout}) {
     const [show, setShow] = useState(false);
     const triggerRef = useRef(null);
-
-    const userName = session?.name || session?.nama || "";
-
-    const firstLetter = userName ? userName.split(' ').map(val => val[0]).join("") : "G";
-
+    
     const {theme, toogleTheme} = useContext(themeContext);
-
   return (
     <>
         <header className={`w-full sticky top-0 z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
@@ -59,7 +54,13 @@ function Attendee({session, onLogout}) {
                         }
                         return setShow(false)
                     }} className="w-7 h-7 hidden lg:flex justify-center items-center text-xs font-medium text-gray-100 text-center bg-orange-600 rounded-full cursor-pointer">
-                        <span>{firstLetter}</span>
+                        <img
+                            src={
+                            "https://images.unsplash.com/photo-1772371272141-0fbd644b65c4?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D"
+                            }
+                            alt="User Avatar"
+                            className="w-7 h-7 rounded-full object-cover border border-slate-200"
+                        />
                     </div>
                     <FaBars className="flex lg:hidden font-semibold"/>
                 </div>

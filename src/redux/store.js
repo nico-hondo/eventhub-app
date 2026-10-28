@@ -9,6 +9,7 @@ import eventReducer from './slices/eventSlice';
 import communityReducer from './slices/communitySlice';
 import testimonyReducer from './slices/testiSlice';
 import notifReducer from './slices/notifSlice';
+import userReducer from './slices/userSlice';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 
 const storage = {
@@ -44,6 +45,7 @@ const store = configureStore({
         community: communityReducer,
         testimony: testimonyReducer,
         notification: notifReducer,
+        user: userReducer,
     },
      middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

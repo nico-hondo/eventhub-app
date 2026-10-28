@@ -1,23 +1,9 @@
 // import events from '../../../data/events.json';
 import EventDiscover from '../../../components/event/EventDiscover';
 import { convertDate, convertHour } from '../../../components/utils/utilitas';
-import { useEffect} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchEvents } from '../../../redux/slices/eventSlice';
-import { useSearchParams } from 'react-router';
+import { useSelector } from 'react-redux';
 
 function EventList({theme}) {
-    const [searchParams] = useSearchParams();
-    const search = searchParams.get("search") || "";
-    const category = searchParams.get("category") || "";
-    const location = searchParams.get("location") || "";
-
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(fetchEvents({search, location, category}));
-    }, [dispatch, search, location, category]);
-    
     
     const {events = [], isLoading, error} = useSelector((state) => state.events);
 
